@@ -9,7 +9,7 @@ CFLAGS  = -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl -I include/
 # The build target 
 TARGET = triangle
 
-all: $(TARGET)
+all: $(TARGET).o
 
 $(TARGET).o: $(TARGET).cpp
 	$(CC) $(CFLAGS) -o $(TARGET).o $(TARGET).cpp
