@@ -1,3 +1,6 @@
+# my glfw source folder
+glfw/
+
 # Prerequisites
 *.d
 
