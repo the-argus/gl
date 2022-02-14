@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+#include "constants.h"
+
 int main() {
 	glfwInit();
 
@@ -14,7 +16,7 @@ int main() {
 	
 	// create GLFW window object
 	// not really sure what the nulls are for
-	GLFWwindow* window = glfwCreateWindow(800, 600, "OpenGL", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "OpenGL", NULL, NULL);
 
 	// catch initialization failure and cleanup
 	if (window == NULL)
@@ -38,7 +40,7 @@ int main() {
 
 	// our first openGL function
 	// tells opengl the size of the rendering window (make it the same size as the window glfw just created)
-	glViewport(0, 0, 800, 600);
+	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	return 0;
 }
