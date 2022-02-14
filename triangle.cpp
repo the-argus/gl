@@ -12,6 +12,13 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+void processInput(GLFWwindow *window)
+{
+    // one liner key handling
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+}
+
 int main()
 {
 	glfwInit();
@@ -58,6 +65,16 @@ int main()
     // enter window loop
     while(!glfwWindowShouldClose(window))
     {
+        processInput(window);
+
+        // rendering code
+        // ...
+        
+        // configure color to fill the screen with upon clear
+        glClearColor( 0.5f, 0.1f, 0.1f, 1.0f);
+        // clear the screen buffer with color
+        glClear(GL_COLOR_BUFFER_BIT);
+
         // moves the buffer that is being drawn to into the window so it
         // actually gets drawn by the graphical environment
         glfwSwapBuffers(window);
