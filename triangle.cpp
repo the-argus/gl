@@ -5,6 +5,12 @@
 
 #include "constants.h"
 
+float vertices[] = {
+    -0.5f, -0.5f, 0.0f,
+     0.5f, -0.5f, 0.0f,
+     0.0f,  0.5f, 0.0f
+};
+
 // create callback function which gets called whenever the window gets
 // resized
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
