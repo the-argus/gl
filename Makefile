@@ -12,7 +12,9 @@ TARGET = triangle
 all: $(TARGET).o
 
 $(TARGET).o: $(TARGET).cpp
-	$(CC) $(CFLAGS) -o $(TARGET).o $(TARGET).cpp
+	# CFLAGS MUST COME AFTER TARGET FOR CORRECT LINKING
+	#  :(
+	$(CC) -o $(TARGET).o $(TARGET).cpp $(CFLAGS)
 
 clean:
 	$(RM) $(TARGET)
