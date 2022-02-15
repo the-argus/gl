@@ -73,13 +73,14 @@ int main()
     {
         processInput(window);
 
-        // rendering code
-        // ...
+        // RENDERING CODE ----------
         
         // configure color to fill the screen with upon clear
         glClearColor( 0.5f, 0.1f, 0.1f, 1.0f);
         // clear the screen buffer with color
         glClear(GL_COLOR_BUFFER_BIT);
+
+        // END ---------------------
 
         // moves the buffer that is being drawn to into the window so it
         // actually gets drawn by the graphical environment
