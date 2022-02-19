@@ -3,7 +3,7 @@ CC = g++
 
 # cross platform vars ---------------------
 WIN_TARGET = triangle.exe
-UNIX_TARGET = triangle
+UNIX_TARGET = triangle.out
 
 # compiler flags:
 #  -g     - this flag adds debugging information to the executable file
@@ -14,7 +14,7 @@ WIN_CCFLAGS = -lglfw3 -lGdi32
 UNIX_INCLUDE = -I ./include/
 WIN_INCLUDE = -I ./include/ -I "C:/Program Files (x86)/GLFW/include"
 
-UNIX_LINKFLAGS = ""
+UNIX_LINKFLAGS = 
 WIN_LINKFLAGS = -L"C:/Program Files (x86)/GLFW/lib"
 
 # platform detection ----------------------
