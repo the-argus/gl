@@ -5,11 +5,20 @@
 
 #include "constants.h"
 
+
 float vertices[] = {
     -0.5f, -0.5f, 0.0f,
      0.5f, -0.5f, 0.0f,
      0.0f,  0.5f, 0.0f
 };
+
+
+const char *vShaderSource = "#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "void main()\n"
+    "{\n"
+    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "}\0";
 
 // create callback function which gets called whenever the window gets
 // resized
@@ -23,6 +32,21 @@ void processInput(GLFWwindow *window)
     // one liner key handling
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+}
+
+void loadShader(unsigned int shader, const GLchar* const* shaderSource) {
+    glShaderSource(shader, 1, shaderSource, NULL);
+    
+    int  success;
+    // error message buffer
+    char infoLog[512];
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+
+    if(!success)
+    {
+        glGetShaderInfoLog(shader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
 }
 
 int main()
@@ -67,7 +91,19 @@ int main()
     
     // tell glfw to bind that func to resizing the window
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    
+
+    unsigned int vShader;
+    vShader = glCreateShader(GL_VERTEX_SHADER);
+
+    loadShader(vShader, vShaderSource)
+
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    // send the vertices into the GL_ARRAY_BUFFER buffer, which is bound to VBO
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
     // enter window loop
     while(!glfwWindowShouldClose(window))
     {
@@ -91,6 +127,7 @@ int main()
     }
     
     // cleanup glfw's allocated resources
+    glDeleteBuffers(1, &VBO);
     glfwTerminate();
 
 	return 0;
