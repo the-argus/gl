@@ -92,10 +92,9 @@ int main()
     // tell glfw to bind that func to resizing the window
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    unsigned int vShader;
-    vShader = glCreateShader(GL_VERTEX_SHADER);
+    unsigned int vShader = glCreateShader(GL_VERTEX_SHADER);
 
-    loadShader(vShader, vShaderSource)
+    loadShader(vShader, &vShaderSource);
 
     unsigned int VBO;
     glGenBuffers(1, &VBO);
