@@ -36,6 +36,7 @@ void processInput(GLFWwindow *window)
 
 void loadShader(unsigned int shader, const GLchar* const* shaderSource) {
     glShaderSource(shader, 1, shaderSource, NULL);
+    glCompileShader(shader);
     
     int  success;
     // error message buffer
