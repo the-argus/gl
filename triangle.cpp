@@ -111,25 +111,60 @@ int main()
     unsigned int shaderProgram;
     shaderProgram = glCreateProgram();
 
+    // attach the shaders to the shader program
+    glAttachShader(shaderProgram, vShader);
+    glAttachShader(shaderProgram, fShader);
+    glLinkProgram(shaderProgram);
+
+    // we no longer need shader objects, so free up that memory
+    glDeleteShader(vShader);
+    glDeleteShader(fShader);
+
+
+    
+    // create vertex buffer object and store the ID in VBO
     unsigned int VBO;
+    // also make a Vertex Array Object, which is used to group
+    // vertex attribute data together
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    
+
+    // 1. bind vertex array object
+    glBindVertexArray(VAO);
+    // 2. move the vertices array into an actual opengl buffer
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-    // send the vertices into the GL_ARRAY_BUFFER buffer, which is bound to VBO
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // tell opengl how the vertices are formatted
+    // 3 items per vertex, 32 bit floats,
+    // normalized = false, then null pointer describing the offset of
+    // the data in the array (there is no offset, its at the start)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float),
+                        (void*)0);
+    glEnableVertexAttribArray(0);
+    // first VAO complete
+    
 
     // enter window loop
     while(!glfwWindowShouldClose(window))
     {
         processInput(window);
-
-        // RENDERING CODE ----------
         
         // configure color to fill the screen with upon clear
         glClearColor( 0.5f, 0.1f, 0.1f, 1.0f);
         // clear the screen buffer with color
         glClear(GL_COLOR_BUFFER_BIT);
 
+        // RENDERING CODE ----------
+        glUseProgram(shaderProgram);
+        glBindVertexArray(VAO);
+
+        // DRAW THE TRIANGLE FRFR
+        // primitive type, starting index, number of vertices to draw
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        
         // END ---------------------
 
         // moves the buffer that is being drawn to into the window so it
