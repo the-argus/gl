@@ -12,6 +12,12 @@ float vertices[] = {
      0.0f,  0.5f, 0.0f
 };
 
+const char *fShaderSource = "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "void main()\n"
+    "{\n"
+    "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "}\0";
 
 const char *vShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
@@ -92,10 +98,18 @@ int main()
     
     // tell glfw to bind that func to resizing the window
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
+    
+    // load and compile vertex shader
     unsigned int vShader = glCreateShader(GL_VERTEX_SHADER);
-
     loadShader(vShader, &vShaderSource);
+    
+    // load and compile fragment shader
+    unsigned int fShader = glCreateShader(GL_FRAGMENT_SHADER);
+    loadShader(fShader, &fShaderSource);
+
+    // create a shader program
+    unsigned int shaderProgram;
+    shaderProgram = glCreateProgram();
 
     unsigned int VBO;
     glGenBuffers(1, &VBO);
