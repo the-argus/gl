@@ -2,21 +2,42 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <cmath>
 
 #include "constants.h"
+#include "shader.h"
 
-
-float vertices[] = {
+float triangle_vertices[] = {
     -0.5f, -0.5f, 0.0f,
      0.5f, -0.5f, 0.0f,
      0.0f,  0.5f, 0.0f
 };
 
+float vertices[] = {
+0.5f, 0.5f, 0.0f, // top right
+0.5f, -0.5f, 0.0f, // bottom right
+-0.5f, -0.5f, 0.0f, // bottom left
+-0.5f, 0.5f, 0.0f // top left
+};
+
+unsigned int indices[] = { // note that we start from 0!
+    0, 1, 3, // first triangle
+    1, 2, 3 // second triangle
+};
+
 const char *fShaderSource = "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "uniform vec4 timeColor;"
+    "void main()\n"
+    "{\n"
+    "FragColor = timeColor;\n"
+    "}\0";
+
+const char *yellow_fShaderSource = "#version 330 core\n"
     "out vec4 FragColor;\n"
     "void main()\n"
     "{\n"
-    "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "FragColor = vec4(1.0f, 1.0f, 0.2f, 1.0f);\n"
     "}\0";
 
 const char *vShaderSource = "#version 330 core\n"
@@ -25,6 +46,35 @@ const char *vShaderSource = "#version 330 core\n"
     "{\n"
     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
     "}\0";
+
+void move2DVertices(GLFWwindow* window, float (&verts)[], int move_x, int move_y) {
+    int subdex = 0;
+    int size = (int)(sizeof(*verts)/sizeof(float));
+    float scale_x;
+    float scale_y;
+    int w_x;
+    int w_y;
+    glfwGetWindowSize(window, &w_x, &w_y);
+    scale_x = move_x / scale_x;
+    scale_y = move_y / scale_y;
+    for (int vert = 0; vert < size; vert++) {
+        switch (subdex) {
+            case 0:
+                continue;
+                break;
+            case 1:
+                verts[vert] += scale_x;
+                break;
+            case 2:
+                verts[vert] += scale_y;
+                break;
+            default:
+                std::cout << "error" << std::endl;
+        }
+
+        subdex %= 3;
+    }
+}
 
 // create callback function which gets called whenever the window gets
 // resized
@@ -38,9 +88,25 @@ void processInput(GLFWwindow *window)
     // one liner key handling
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    int xin = 0;
+    int yin = 0;
+
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        xin += 1;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        xin -= 1;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        yin += 1;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        yin -= 1;
+
+    move2DVertices(window, triangle_vertices, xin, yin);
+
 }
 
-void loadShader(unsigned int shader, const GLchar* const* shaderSource) {
+void loadShader(unsigned int shader, const GLchar* const* shaderSource)
+{
     glShaderSource(shader, 1, shaderSource, NULL);
     glCompileShader(shader);
     
@@ -58,6 +124,7 @@ void loadShader(unsigned int shader, const GLchar* const* shaderSource) {
 
 int main()
 {
+    triangle_vertices[6] += 0.1;
 	glfwInit();
 
 	// set the window hints to reflect version
@@ -106,34 +173,55 @@ int main()
     // load and compile fragment shader
     unsigned int fShader = glCreateShader(GL_FRAGMENT_SHADER);
     loadShader(fShader, &fShaderSource);
+    
+    // alternate fragment shader which is yellow
+    unsigned int yellow_fShader = glCreateShader(
+            GL_FRAGMENT_SHADER);
+    loadShader(yellow_fShader, &yellow_fShaderSource);
 
     // create a shader program
     unsigned int shaderProgram;
     shaderProgram = glCreateProgram();
+
+    // alternate yellow program
+    unsigned int yellow_shaderProgram;
+    yellow_shaderProgram = glCreateProgram();
 
     // attach the shaders to the shader program
     glAttachShader(shaderProgram, vShader);
     glAttachShader(shaderProgram, fShader);
     glLinkProgram(shaderProgram);
 
+    // attach for yellow
+    glAttachShader(yellow_shaderProgram, vShader);
+    glAttachShader(yellow_shaderProgram, yellow_fShader);
+    glLinkProgram(yellow_shaderProgram);
+
     // we no longer need shader objects, so free up that memory
     glDeleteShader(vShader);
     glDeleteShader(fShader);
+    glDeleteShader(yellow_fShader);
 
 
     
     // create vertex buffer object and store the ID in VBO
     unsigned int VBO;
+    glGenBuffers(1, &VBO);
     // also make a Vertex Array Object, which is used to group
     // vertex attribute data together
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
-    
+    // EBO for drawing vertices in certain order
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
+    // bind indices
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+            GL_STATIC_DRAW);
 
     // 1. bind vertex array object
     glBindVertexArray(VAO);
     // 2. move the vertices array into an actual opengl buffer
-    glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
@@ -144,13 +232,35 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float),
                         (void*)0);
     glEnableVertexAttribArray(0);
-    // first VAO complete
     
+    // first VAO complete, now make a second one for yellow triangle
+
+    unsigned int tVBO;
+    unsigned int tVAO;
+    glGenBuffers(1, &tVBO);
+    glGenVertexArrays(1, &tVAO);
+    
+    glBindVertexArray(tVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, tVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_vertices),
+            triangle_vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float),
+                        (void*)0);
+    glEnableVertexAttribArray(0); 
 
     // enter window loop
     while(!glfwWindowShouldClose(window))
     {
         processInput(window);
+
+        // uniform time
+        float timeValue = glfwGetTime();
+        float greenValue = (sin(timeValue*2) / 2.0f) + 0.5f;
+        float redValue = (cos(timeValue*2) / 2.0f) + 0.5f;
+        float blueValue = (sin(timeValue*2 + 1.6f) / 2.0f) + 0.5f;
+
+        int vertexColorLocation = glGetUniformLocation(shaderProgram,
+                "timeColor");
         
         // configure color to fill the screen with upon clear
         glClearColor( 0.5f, 0.1f, 0.1f, 1.0f);
@@ -159,25 +269,40 @@ int main()
 
         // RENDERING CODE ----------
         glUseProgram(shaderProgram);
-        glBindVertexArray(VAO);
+        // send in uniform
+        glUniform4f(vertexColorLocation, redValue, greenValue,
+                blueValue, 1.0f);
 
-        // DRAW THE TRIANGLE FRFR
-        // primitive type, starting index, number of vertices to draw
+        glBindVertexArray(VAO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+        //DRAW RECTANGLE
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        // unbind vertex array
+        glBindVertexArray(0);
+        
+        // draw yellow triangle
+        glUseProgram(yellow_shaderProgram);
+        glBindVertexArray(tVAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBindVertexArray(0);
         
         // END ---------------------
+        // std::cout << triangle_vertices[0] << " " << triangle_vertices[1] << " " << triangle_vertices[2] << std::endl;
 
         // moves the buffer that is being drawn to into the window so it
         // actually gets drawn by the graphical environment
         glfwSwapBuffers(window);
 
-        // checks if any events like window resizing or button presses happen
+        // checks if any events like window resizing or
+        // button presses happen
         glfwPollEvents();    
     }
     
     // cleanup glfw's allocated resources
     glDeleteBuffers(1, &VBO);
     glfwTerminate();
+
 
 	return 0;
 }

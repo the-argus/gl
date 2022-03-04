@@ -11,10 +11,10 @@ TARGET = triangle
 
 LINKED = glad.c
 
-all: $(TARGET).o
+all: $(TARGET)
 
-$(TARGET).o: $(TARGET).cpp
-	$(CC) -o $(TARGET).o $(TARGET).cpp $(LINKED) $(CFLAGS)
+$(TARGET): $(TARGET).cpp
+	$(CC) -o $(TARGET) $(TARGET).cpp $(LINKED) $(CFLAGS)
 
 clean:
-	$(RM) $(TARGET).o
+	$(RM) $(TARGET)
