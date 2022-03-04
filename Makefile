@@ -21,6 +21,7 @@ WIN_LINKFLAGS = -L"C:/Program Files (x86)/GLFW/lib"
 SECONDARY_TARGETS = $(shell ls ./deps/*.c) $(shell ls ./deps/*.cpp)
 
 OBJDIR = obj
+SRCDIR = src
 
 # platform detection ----------------------
 
@@ -76,10 +77,11 @@ endif
 # DIRS := ./ $(SUBDIRS)
 # SOURCE_FILES := $(foreach d, $(DIRS), $(wildcard $(d)*.cpp) )
 
-SOURCE_FILES = main.cpp $(shell ls src)
+SRCNAME = main.cpp $(shell ls $(SRCDIR))
+SOURCE_FILES = $(addprefix $(SRCDIR)/,$(SRCNAME))
 
 # Create an object file of every cpp file
-OBJECTS = $(addprefix $(OBJDIR)/,$(SOURCE_FILES:.cpp=.o))
+OBJECTS = $(addprefix $(OBJDIR)/,$(SRCNAME:.cpp=.o))
 
 # building --------------------------------
 
@@ -91,7 +93,7 @@ $(TARGET): $(OBJECTS)
 
 # Compile every cpp file to an object
 $(OBJDIR)/%.o: %.cpp
-	$(CC) -c $(CCFLAGS) -o $@ $< $(INCLUDE) $(LINKFLAGS)
+	$(CC) -c $(CCFLAGS) -o $(OBJDIR)/$@ $< $(INCLUDE) $(LINKFLAGS)
 
 
 obj:
