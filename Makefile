@@ -8,8 +8,8 @@ UNIX_TARGET = triangle
 # compiler flags:
 #  -g     - this flag adds debugging information to the executable file
 #  -Wall  - this flag is used to turn on most compiler warnings
-UNIX_CCFLAGS = -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl
-WIN_CCFLAGS = -lglfw3 -lGdi32
+UNIX_CCFLAGS = -fpermissive -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl
+WIN_CCFLAGS = -fpermissive -lglfw3 -lGdi32
 
 UNIX_INCLUDE = -I ./include/
 WIN_INCLUDE = -I ./include/ -I "C:/Program Files (x86)/GLFW/include"
@@ -71,29 +71,25 @@ LINKFLAGS = $(UNIX_LINKFLAGS)
     endif
 endif
 
-# make list of object files to compile ----
 # Subdirs to search for additional source files
-# SUBDIRS := $(shell ls -F | grep "\/" )
-# DIRS := ./ $(SUBDIRS)
-# SOURCE_FILES := $(foreach d, $(DIRS), $(wildcard $(d)*.cpp) )
-
-SRCNAME = main.cpp $(shell ls $(SRCDIR))
-SOURCE_FILES = $(addprefix $(SRCDIR)/,$(SRCNAME))
+SUBDIRS := $(shell ls -F | grep "\/" )
+DIRS := ./ $(SUBDIRS)
+SOURCE_FILES := $(foreach d, $(DIRS), $(wildcard $(d)*.cpp) )
 
 # Create an object file of every cpp file
-OBJECTS = $(addprefix $(OBJDIR)/,$(SRCNAME:.cpp=.o))
+OBJECTS = $(patsubst %.cpp, %.o, $(SOURCE_FILES))
 
 # building --------------------------------
 
-all: obj $(TARGET)
+all: $(TARGET)
 
 # link the project itself
 $(TARGET): $(OBJECTS)
 	$(CC) $(SECONDARY_TARGETS) -o $(TARGET) $(OBJECTS) $(INCLUDE) $(LINKFLAGS) $(CCFLAGS)
 
 # Compile every cpp file to an object
-$(OBJDIR)/%.o: %.cpp
-	$(CC) -c $(CCFLAGS) -o $(OBJDIR)/$@ $< $(INCLUDE) $(LINKFLAGS)
+%.o: %.cpp
+	$(CC) -c $(CCFLAGS) -o $@ $< $(INCLUDE) $(LINKFLAGS)
 
 
 obj:
