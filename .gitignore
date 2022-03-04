@@ -1,6 +1,9 @@
 # my glfw source folder
 glfw/
 
+# object files directory
+obj/
+
 # Prerequisites
 *.d
 
