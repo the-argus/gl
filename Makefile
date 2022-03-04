@@ -77,18 +77,18 @@ DIRS := ./ $(SUBDIRS)
 SOURCE_FILES := $(foreach d, $(DIRS), $(wildcard $(d)*.cpp) )
 
 # Create an object file of every cpp file
-OBJECTS = $(patsubst %.cpp, %.o, $(SOURCE_FILES))
+OBJECTS = $(addprefix $(OBJDIR)/,$(patsubst %.cpp, %.o, $(shell basename $(SOURCE_FILES))))
 
 # building --------------------------------
 
-all: $(TARGET)
+all: obj $(TARGET)
 
 # link the project itself
 $(TARGET): $(OBJECTS)
 	$(CC) $(SECONDARY_TARGETS) -o $(TARGET) $(OBJECTS) $(INCLUDE) $(LINKFLAGS) $(CCFLAGS)
 
 # Compile every cpp file to an object
-%.o: %.cpp
+$(OBJDIR)/%.o: %.cpp
 	$(CC) -c $(CCFLAGS) -o $@ $< $(INCLUDE) $(LINKFLAGS)
 
 
