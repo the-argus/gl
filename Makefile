@@ -20,6 +20,8 @@ WIN_LINKFLAGS = -L"C:/Program Files (x86)/GLFW/lib"
 # add c and cpp files inside of deps folder
 SECONDARY_TARGETS = $(shell ls ./deps/*.c) $(shell ls ./deps/*.cpp)
 
+OBJDIR = obj
+
 # platform detection ----------------------
 
 # copied from https://stackoverflow.com/questions/714100/os-detecting-makefile
@@ -70,27 +72,33 @@ endif
 
 # make list of object files to compile ----
 # Subdirs to search for additional source files
-SUBDIRS := $(shell ls -F | grep "\/" )
-DIRS := ./ $(SUBDIRS)
-SOURCE_FILES := $(foreach d, $(DIRS), $(wildcard $(d)*.cpp) )
+# SUBDIRS := $(shell ls -F | grep "\/" )
+# DIRS := ./ $(SUBDIRS)
+# SOURCE_FILES := $(foreach d, $(DIRS), $(wildcard $(d)*.cpp) )
+
+SOURCE_FILES = main.cpp $(shell ls src)
 
 # Create an object file of every cpp file
-OBJECTS = $(patsubst %.cpp, %.o, $(SOURCE_FILES)) $(DEPS)
+OBJECTS = $(addprefix $(OBJDIR)/,$(SOURCE_FILES:.cpp=.o))
 
 # building --------------------------------
 
-all: $(TARGET)
+all: obj $(TARGET)
 
-# Compile every cpp file to an object
-%.o: %.cpp
-	$(CC) -c $(CCFLAGS) -o bin/$@ $< $(INCLUDE) $(LINKFLAGS) $(CCFLAGS)
-
-# compile the project itself
+# link the project itself
 $(TARGET): $(OBJECTS)
 	$(CC) $(SECONDARY_TARGETS) -o $(TARGET) $(OBJECTS) $(INCLUDE) $(LINKFLAGS) $(CCFLAGS)
 
+# Compile every cpp file to an object
+$(OBJDIR)/%.o: %.cpp
+	$(CC) -c $(CCFLAGS) -o $@ $< $(INCLUDE) $(LINKFLAGS)
+
+
+obj:
+	mkdir -p $(OBJDIR)
+
 clean:
-	$(RM) $(TARGET) $(OBJECTS)
+	$(RM) $(TARGET) $(OBJECTS) && rmdir $(OBJDIR)
 
 run: $(TARGET)
 	./$(TARGET) 
