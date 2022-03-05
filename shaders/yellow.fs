@@ -1,9 +1,8 @@
-#version 330 core
+#version 330 core\n"
 
 out vec4 FragColor;
-uniform vec4 timeColor;
 
 void main()
 {
-    FragColor = timeColor;
-};
+    FragColor = vec4(1.0f, 1.0f, 0.2f, 1.0f);
+}
