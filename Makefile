@@ -78,7 +78,7 @@ DIRS := ./ $(SRCDIR) $(SUBDIRS)
 SOURCE_FILES := $(foreach d, $(DIRS), $(wildcard $(d)*.cpp) )
 
 # Create an object file of every cpp file
-OBJECTS = $(addprefix $(OBJDIR)/,$(patsubst %.cpp, %.o, $(shell basename $(SOURCE_FILES))))
+OBJECTS := $(addprefix $(OBJDIR)/,$(patsubst %.cpp, %.o, $(shell basename -a $(SOURCE_FILES))))
 
 # building --------------------------------
 
