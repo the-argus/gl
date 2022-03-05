@@ -25,14 +25,6 @@ unsigned int indices[] = { // note that we start from 0!
     1, 2, 3 // second triangle
 };
 
-const char *fShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "uniform vec4 timeColor;"
-    "void main()\n"
-    "{\n"
-    "FragColor = timeColor;\n"
-    "}\0";
-
 const char *yellow_fShaderSource = "#version 330 core\n"
     "out vec4 FragColor;\n"
     "void main()\n"
