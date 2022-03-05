@@ -71,9 +71,10 @@ LINKFLAGS = $(UNIX_LINKFLAGS)
     endif
 endif
 
-# Subdirs to search for additional source files
-SUBDIRS := $(shell ls -F | grep "\/" )
-DIRS := ./ $(SUBDIRS)
+# Subdirs to search for additional source files (all subdirs of SRCDIR)
+SUBDIRS := $(shell ls $(SRCDIR) -F | grep "\/" )
+# add root and the SRCDIR itself to the list of dirs to search
+DIRS := ./ $(SRCDIR) $(SUBDIRS)
 SOURCE_FILES := $(foreach d, $(DIRS), $(wildcard $(d)*.cpp) )
 
 # Create an object file of every cpp file
