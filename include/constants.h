@@ -10,3 +10,5 @@
 #define FRAG_COL_POS "shaders/poscolor.fs"
 #define VERTEX_COL_POS "shaders/poscolor.vs"
 #define VERTEX_OFFSET "shaders/offset.vs"
+#define VERTEX_TEX_OFFSET "shaders/texture-offset.vs"
+#define FRAG_TEX "shaders/texture.fs"

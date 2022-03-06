@@ -6,6 +6,7 @@
 
 #include "constants.h"
 #include "shader.h"
+#include "stb_image.h"
 
 float triangle_vertices[] = {
     -0.5f, -0.5f, 0.0f,
@@ -14,45 +15,17 @@ float triangle_vertices[] = {
 };
 
 float vertices[] = {
-    0.5f, 0.5f, 0.0f, // top right
-    0.5f, -0.5f, 0.0f, // bottom right
-    -0.5f, -0.5f, 0.0f, // bottom left
-    -0.5f, 0.5f, 0.0f // top left
+    // positions            // texcoords
+     0.5f,  0.5f, 0.0f,     1.0f, 1.0f, // top right
+     0.5f, -0.5f, 0.0f,     1.0f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f,     0.0f, 0.0f, // bottom left
+    -0.5f,  0.5f, 0.0f,     0.0f, 1.0f  // top left
 };
 
 unsigned int indices[] = { // note that we start from 0!
     0, 1, 3, // first triangle
     1, 2, 3 // second triangle
 };
-
-void move2DVertices(GLFWwindow* window, float (&verts)[], int move_x, int move_y) {
-    int subdex = 0;
-    int size = (int)(sizeof(*verts)/sizeof(float));
-    float scale_x;
-    float scale_y;
-    int w_x;
-    int w_y;
-    glfwGetWindowSize(window, &w_x, &w_y);
-    scale_x = move_x / scale_x;
-    scale_y = move_y / scale_y;
-    for (int vert = 0; vert < size; vert++) {
-        switch (subdex) {
-            case 0:
-                continue;
-                break;
-            case 1:
-                verts[vert] += scale_x;
-                break;
-            case 2:
-                verts[vert] += scale_y;
-                break;
-            default:
-                std::cout << "error" << std::endl;
-        }
-
-        subdex %= 3;
-    }
-}
 
 // create callback function which gets called whenever the window gets
 // resized
@@ -66,21 +39,6 @@ void processInput(GLFWwindow *window)
     // one liner key handling
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-
-    int xin = 0;
-    int yin = 0;
-
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        xin += 1;
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        xin -= 1;
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        yin += 1;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        yin -= 1;
-
-    move2DVertices(window, triangle_vertices, xin, yin);
-
 }
 
 void loadShader(unsigned int shader, const GLchar* const* shaderSource)
@@ -164,6 +122,8 @@ int main()
     Shader yellow_shader(VERTEX_OFFSET, FRAG_YELLOW);
     Shader time_shader(VERTEX_OFFSET, FRAG_TIMER);
     Shader col_pos_shader(VERTEX_COL_POS, FRAG_COL_POS);
+    // shader that draws with offset + a texture
+    Shader tex_pos_shader(VERTEX_TEX_OFFSET, FRAG_TEX);
 
     // 1. bind vertex array object
     glBindVertexArray(VAO);
@@ -172,12 +132,15 @@ int main()
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     // tell opengl how the vertices are formatted
-    // 3 items per vertex, 32 bit floats,
+    // 5 items per vertex, 32 bit floats,
     // normalized = false, then null pointer describing the offset of
     // the data in the array (there is no offset, its at the start)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float),
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float),
                         (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float),
+                        (void*)(3*sizeof(float)));
+    glEnableVertexAttribArray(1);
     
     // first VAO complete, now make a second one for yellow triangle
 
@@ -192,7 +155,29 @@ int main()
             triangle_vertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float),
                         (void*)0);
-    glEnableVertexAttribArray(0); 
+    glEnableVertexAttribArray(0);
+
+    // TEXTURES -----------------------
+    // allocate opengl texture object
+    unsigned int jaypehg;
+    glGenTextures(1, &jaypehg);
+    glBindTexture(GL_TEXTURE_2D, jaypehg);
+
+    // load textures from file (nrChannels == number of color channels)
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("jpeg.png", &width, &height,
+            &nrChannels, 0);
+    if (data) {
+        // generate tex2d at currently bound texture using the data char pointer
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height,
+                0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    } else {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+
+    // free up memory
+    stbi_image_free(data);
 
     // enter window loop
     while(!glfwWindowShouldClose(window))
@@ -211,19 +196,26 @@ int main()
         float greenValue = (sin(timeValue*2) / 2.0f) + 0.5f;
         float redValue = (cos(timeValue*2) / 2.0f) + 0.5f;
         float blueValue = (sin(timeValue*2 + 1.6f) / 2.0f) + 0.5f;
+
+        tex_pos_shader.use();
+        tex_pos_shader.setVec3("vOffset", -redValue, -greenValue, -blueValue);
+        
+        glBindTexture(GL_TEXTURE_2D, jaypehg);
+        glBindVertexArray(VAO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         
         time_shader.use();
 
         time_shader.setVec3("vOffset", -redValue, -greenValue, -blueValue);
 
         time_shader.setVec4("timeColor", redValue,
-                greenValue, blueValue, 1.0f);
+                greenValue, blueValue, 0.5f);
 
-        glBindVertexArray(VAO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
         //DRAW RECTANGLE
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         // unbind vertex array
         glBindVertexArray(0);
         

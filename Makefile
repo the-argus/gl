@@ -86,7 +86,7 @@ $(info $$OBJECTS is [${OBJECTS}])
 
 # building --------------------------------
 
-all: obj $(TARGET)
+all: obj src $(TARGET)
 
 # link the project itself
 $(TARGET): $(OBJECTS)
@@ -99,6 +99,9 @@ $(OBJDIR)%.o: %.cpp
 
 obj:
 	mkdir -p $(OBJDIR)
+
+src:
+	mkdir -p $(SRCDIR)
 
 clean:
 	$(RM) $(TARGET) $(OBJECTS) && rmdir $(OBJDIR)
