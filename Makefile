@@ -21,7 +21,7 @@ WIN_LINKFLAGS = -L"C:/Program Files (x86)/GLFW/lib"
 SECONDARY_TARGETS = $(shell ls ./deps/*.c) $(shell ls ./deps/*.cpp)
 
 OBJDIR = obj/
-SRCDIR = ./src/
+SRCDIR = src/
 
 # platform detection ----------------------
 
