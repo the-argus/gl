@@ -20,8 +20,8 @@ WIN_LINKFLAGS = -L"C:/Program Files (x86)/GLFW/lib"
 # add c and cpp files inside of deps folder
 SECONDARY_TARGETS = $(shell ls ./deps/*.c) $(shell ls ./deps/*.cpp)
 
-OBJDIR = obj
-SRCDIR = src
+OBJDIR = obj/
+SRCDIR = ./src/
 
 # platform detection ----------------------
 
@@ -75,10 +75,14 @@ endif
 SUBDIRS := $(shell ls $(SRCDIR) -F | grep "\/" )
 # add root and the SRCDIR itself to the list of dirs to search
 DIRS := ./ $(SRCDIR) $(SUBDIRS)
-SOURCE_FILES := $(foreach d, $(DIRS), $(wildcard $(d)*.cpp) )
+SOURCE_FILES := $(foreach dir, $(DIRS), $(wildcard $(dir)*.cpp) )
+
+$(info $$SOURCE_FILES is [${SOURCE_FILES}])
 
 # Create an object file of every cpp file
-OBJECTS := $(addprefix $(OBJDIR)/,$(patsubst %.cpp, %.o, $(shell basename -a $(SOURCE_FILES))))
+OBJECTS := $(addprefix $(OBJDIR),$(patsubst %.cpp, %.o, $(shell basename -a $(SOURCE_FILES))))
+
+$(info $$OBJECTS is [${OBJECTS}])
 
 # building --------------------------------
 
@@ -89,7 +93,7 @@ $(TARGET): $(OBJECTS)
 	$(CC) $(SECONDARY_TARGETS) -o $(TARGET) $(OBJECTS) $(INCLUDE) $(LINKFLAGS) $(CCFLAGS)
 
 # Compile every cpp file to an object
-$(OBJDIR)/%.o: %.cpp
+$(OBJDIR)%.o: %.cpp
 	$(CC) -c $(CCFLAGS) -o $@ $< $(INCLUDE) $(LINKFLAGS)
 
 
