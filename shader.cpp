@@ -23,6 +23,12 @@ void Shader::setVec4(const std::string &name, float red,
     glUniform4f(glGetUniformLocation(ID, name.c_str()),
             red, green, blue, alpha);
 }
+void Shader::setVec3(const std::string &name, float x,
+    float y, float z) const
+{
+    glUniform3f(glGetUniformLocation(ID, name.c_str()),
+            x, y, z);
+}
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {

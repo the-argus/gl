@@ -161,8 +161,9 @@ int main()
             GL_STATIC_DRAW);
 
     // shader program objects
-    Shader yellow_shader(VERTEX_PASSTHROUGH, FRAG_YELLOW);
-    Shader time_shader(VERTEX_PASSTHROUGH, FRAG_TIMER);
+    Shader yellow_shader(VERTEX_OFFSET, FRAG_YELLOW);
+    Shader time_shader(VERTEX_OFFSET, FRAG_TIMER);
+    Shader col_pos_shader(VERTEX_COL_POS, FRAG_COL_POS);
 
     // 1. bind vertex array object
     glBindVertexArray(VAO);
@@ -213,6 +214,8 @@ int main()
         
         time_shader.use();
 
+        time_shader.setVec3("vOffset", -redValue, -greenValue, -blueValue);
+
         time_shader.setVec4("timeColor", redValue,
                 greenValue, blueValue, 1.0f);
 
@@ -226,8 +229,15 @@ int main()
         
         // draw yellow triangle
         yellow_shader.use();
+ 
+        yellow_shader.setVec3("vOffset", redValue, greenValue, blueValue);
+
         glBindVertexArray(tVAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        col_pos_shader.use();
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
         glBindVertexArray(0);
         
         // END ---------------------
