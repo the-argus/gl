@@ -1,12 +1,12 @@
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h>
+#include "stb_image.h"
 
 #include <iostream>
 #include <cmath>
 
 #include "constants.h"
 #include "shader.h"
-#include "stb_image.h"
 
 float triangle_vertices[] = {
     -0.5f, -0.5f, 0.0f,
@@ -27,36 +27,8 @@ unsigned int indices[] = { // note that we start from 0!
     1, 2, 3 // second triangle
 };
 
-// create callback function which gets called whenever the window gets
-// resized
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
-
-void processInput(GLFWwindow *window)
-{
-    // one liner key handling
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-}
-
-void loadShader(unsigned int shader, const GLchar* const* shaderSource)
-{
-    glShaderSource(shader, 1, shaderSource, NULL);
-    glCompileShader(shader);
-    
-    int  success;
-    // error message buffer
-    char infoLog[512];
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-
-    if(!success)
-    {
-        glGetShaderInfoLog(shader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-}
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void processInput(GLFWwindow *window);
 
 int main()
 {
@@ -158,6 +130,11 @@ int main()
     glEnableVertexAttribArray(0);
 
     // TEXTURES -----------------------
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // allocate opengl texture object
     unsigned int jaypehg;
     glGenTextures(1, &jaypehg);
@@ -165,10 +142,10 @@ int main()
 
     // load textures from file (nrChannels == number of color channels)
     int width, height, nrChannels;
-    unsigned char *data = stbi_load("jpeg.png", &width, &height,
+    unsigned char *data = stbi_load("board.jpg", &width, &height,
             &nrChannels, 0);
     if (data) {
-        // generate tex2d at currently bound texture using the data char pointer
+        // generate tex2d at currently bound texture using data char pointer
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height,
                 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -206,16 +183,16 @@ int main()
         
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         
-        time_shader.use();
+        // time_shader.use();
 
-        time_shader.setVec3("vOffset", -redValue, -greenValue, -blueValue);
+        // time_shader.setVec3("vOffset", -redValue, -greenValue, -blueValue);
 
-        time_shader.setVec4("timeColor", redValue,
-                greenValue, blueValue, 0.5f);
+        // time_shader.setVec4("timeColor", redValue,
+                // greenValue, blueValue, 0.5f);
 
 
-        //DRAW RECTANGLE
         // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
         // unbind vertex array
         glBindVertexArray(0);
         
@@ -249,4 +226,19 @@ int main()
 
 
 	return 0;
+}
+
+
+// create callback function which gets called whenever the window gets
+// resized
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+}
+
+void processInput(GLFWwindow *window)
+{
+    // one liner key handling
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
 }
