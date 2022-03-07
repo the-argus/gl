@@ -14,12 +14,20 @@ float triangle_vertices[] = {
      0.0f,  0.5f, 0.0f
 };
 
-float vertices[] = {
+float nocolor_vertices[] = {
     // positions            // texcoords
      0.5f,  0.5f, 0.0f,     1.0f, 1.0f, // top right
      0.5f, -0.5f, 0.0f,     1.0f, 0.0f, // bottom right
     -0.5f, -0.5f, 0.0f,     0.0f, 0.0f, // bottom left
     -0.5f,  0.5f, 0.0f,     0.0f, 1.0f  // top left
+};
+
+float vertices[] = {
+    // position             // vertex color     // texcoords
+     0.5f,  0.5f, 0.0f,     0.5f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+     0.5f, -0.5f, 0.0f,     0.0f, 0.5f, 0.0f,   1.0f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f,     0.5f, 0.0f, 0.0f,   0.0f, 0.0f, // bottom left
+    -0.5f,  0.5f, 0.0f,     0.0f, 0.0f, 0.5f,   0.0f, 1.0f  // top left
 };
 
 unsigned int indices[] = { // note that we start from 0!
@@ -97,6 +105,8 @@ int main()
     // shader that draws with offset + a texture
     Shader tex_pos_shader(VERTEX_TEX_OFFSET, FRAG_TEX);
 
+    Shader main_shader(VERTEX_FULL, FRAG_FULL);
+
     // 1. bind vertex array object
     glBindVertexArray(VAO);
     // 2. move the vertices array into an actual opengl buffer
@@ -107,12 +117,15 @@ int main()
     // 5 items per vertex, 32 bit floats,
     // normalized = false, then null pointer describing the offset of
     // the data in the array (there is no offset, its at the start)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float),
-                        (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+            (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float),
-                        (void*)(3*sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+            (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+            (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
     
     // first VAO complete, now make a second one for yellow triangle
 
@@ -142,7 +155,7 @@ int main()
 
     // load textures from file (nrChannels == number of color channels)
     int width, height, nrChannels;
-    unsigned char *data = stbi_load("board.jpg", &width, &height,
+    unsigned char *data = stbi_load("container.jpg", &width, &height,
             &nrChannels, 0);
     if (data) {
         // generate tex2d at currently bound texture using data char pointer
@@ -168,25 +181,10 @@ int main()
 
         // RENDERING CODE ----------
         
-        // uniform time
-        float timeValue = glfwGetTime();
-        float greenValue = (sin(timeValue*2) / 2.0f) + 0.5f;
-        float redValue = (cos(timeValue*2) / 2.0f) + 0.5f;
-        float blueValue = (sin(timeValue*2 + 1.6f) / 2.0f) + 0.5f;
-
-        tex_pos_shader.use();
-        tex_pos_shader.setVec3("vOffset", -redValue, -greenValue, -blueValue);
-        
-        glBindTexture(GL_TEXTURE_2D, jaypehg);
-        glBindVertexArray(VAO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        // draw rectangle with texture
         
         // time_shader.use();
-
         // time_shader.setVec3("vOffset", -redValue, -greenValue, -blueValue);
-
         // time_shader.setVec4("timeColor", redValue,
                 // greenValue, blueValue, 0.5f);
 
@@ -194,7 +192,14 @@ int main()
         // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // unbind vertex array
-        glBindVertexArray(0);
+        //glBindVertexArray(0);
+
+
+        // uniform time
+        float timeValue = glfwGetTime();
+        float greenValue = (sin(timeValue*2) / 2.0f);
+        float redValue = (cos(timeValue*2) / 2.0f);
+        float blueValue = (sin(timeValue*2 + 1.6f) / 2.0f);
         
         // draw yellow triangle
         yellow_shader.use();
@@ -204,9 +209,18 @@ int main()
         glBindVertexArray(tVAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        col_pos_shader.use();
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        //col_pos_shader.use();
+        //glDrawArrays(GL_TRIANGLES, 0, 3);
 
+        glBindVertexArray(0);
+        
+        main_shader.use();
+        
+        glBindTexture(GL_TEXTURE_2D, jaypehg);
+        glBindVertexArray(VAO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
         
         // END ---------------------

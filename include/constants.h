@@ -12,3 +12,5 @@
 #define VERTEX_OFFSET "shaders/offset.vs"
 #define VERTEX_TEX_OFFSET "shaders/texture-offset.vs"
 #define FRAG_TEX "shaders/texture.fs"
+#define FRAG_FULL "shaders/full.fs"
+#define VERTEX_FULL "shaders/full.vs"
