@@ -204,19 +204,6 @@ int main()
         float redValue = (cos(timeValue*2) / 2.0f);
         float blueValue = (sin(timeValue*2 + 1.6f) / 2.0f);
         
-        // draw yellow triangle
-        yellow_shader.use();
- 
-        yellow_shader.setVec3("vOffset", redValue, greenValue, blueValue);
-
-        glBindVertexArray(tVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        //col_pos_shader.use();
-        //glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        glBindVertexArray(0);
-        
         main_shader.use();
         
         glBindTexture(GL_TEXTURE_2D, jaypehg);
@@ -226,6 +213,23 @@ int main()
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
         
+        // draw yellow triangle
+        yellow_shader.use();
+
+        // calculate a transform
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(
+                    0.0, 0.0, 1.0));
+        trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+        // send the transformed matrix into a uniform called "transform"
+        yellow_shader.setMat4("transform", trans);
+ 
+        yellow_shader.setVec3("vOffset", redValue, greenValue, blueValue);
+
+        glBindVertexArray(tVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        glBindVertexArray(0); 
         // END ---------------------
 
         // moves the buffer that is being drawn to into the window so it
