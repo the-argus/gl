@@ -103,7 +103,7 @@ int main()
 
     // shader program objects
     Shader yellow_shader(VERTEX_OFFSET, FRAG_YELLOW);
-    Shader time_shader(VERTEX_OFFSET, FRAG_TIMER);
+    Shader time_shader(VERTEX_TEX_OFFSET, FRAG_TIME_TEXTURED);
     Shader col_pos_shader(VERTEX_COL_POS, FRAG_COL_POS);
     // shader that draws with offset + a texture
     Shader tex_pos_shader(VERTEX_TEX_OFFSET, FRAG_TEX);
@@ -211,10 +211,17 @@ int main()
         // draw rectangle with changing color
         
         time_shader.use();
+
+        // uniforms
         time_shader.setVec3("vOffset", -redValue, -greenValue, -blueValue);
         time_shader.setVec4("timeColor", redValue,
                 greenValue, blueValue, 0.5f);
+        // texture
+        glBindTexture(GL_TEXTURE_2D, jaypehg);
+        // rectangle EBO
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
+        // vertices
         glBindVertexArray(rVAO);
 
         //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
