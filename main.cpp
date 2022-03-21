@@ -145,6 +145,24 @@ int main()
                         (void*)0);
     glEnableVertexAttribArray(0);
 
+    // third for color changing rectangle
+
+    unsigned int rVBO;
+    unsigned int rVAO;
+    glGenBuffers(1, &rVBO);
+    glGenVertexArrays(1, &rVAO);
+
+    glBindVertexArray(rVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, rVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(nocolor_vertices),
+            nocolor_vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float),
+            (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float),
+            (void*)(3*sizeof(float)));
+    glEnableVertexAttribArray(1);
+
     // TEXTURES -----------------------
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -183,20 +201,6 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // RENDERING CODE ----------
-        
-        // draw rectangle with texture
-        
-        // time_shader.use();
-        // time_shader.setVec3("vOffset", -redValue, -greenValue, -blueValue);
-        // time_shader.setVec4("timeColor", redValue,
-                // greenValue, blueValue, 0.5f);
-
-
-        // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-        // unbind vertex array
-        //glBindVertexArray(0);
-
 
         // uniform time
         float timeValue = glfwGetTime();
@@ -204,6 +208,20 @@ int main()
         float redValue = (cos(timeValue*2) / 2.0f);
         float blueValue = (sin(timeValue*2 + 1.6f) / 2.0f);
         
+        // draw rectangle with changing color
+        
+        time_shader.use();
+        time_shader.setVec3("vOffset", -redValue, -greenValue, -blueValue);
+        time_shader.setVec4("timeColor", redValue,
+                greenValue, blueValue, 0.5f);
+
+        glBindVertexArray(rVAO);
+
+        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+        
+
+        // box
         main_shader.use();
         
         glBindTexture(GL_TEXTURE_2D, jaypehg);
