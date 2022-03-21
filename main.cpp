@@ -11,6 +11,9 @@
 #include "constants.h"
 #include "shader.h"
 
+// cube vertices
+#include "cube.h"
+
 float triangle_vertices[] = {
     -0.5f, -0.5f, 0.0f,
      0.5f, -0.5f, 0.0f,
@@ -110,6 +113,9 @@ int main()
 
     Shader main_shader(VERTEX_FULL, FRAG_FULL);
 
+    // the big boy
+    Shader main_shader_3D(VERTEX_FULL_3D, FRAG_FULL);
+
     // 1. bind vertex array object
     glBindVertexArray(VAO);
     // 2. move the vertices array into an actual opengl buffer
@@ -201,6 +207,32 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // RENDERING CODE ----------
+        
+        // 3d cube!!
+
+        main_shader_3D.use();
+        
+        // plane rotation matrix
+        glm::mat4 model = glm::mat4(1.0f);
+        // rotate the moving rectangle backwards in 3d space
+        model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f)); 
+        // view matrix (move worldspace away from camera/ negative z)
+        glm::mat4 view = glm::mat4(1.0f);
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); 
+        // PROJECTION MATRIX BAYBEE
+        glm::mat4 projection;
+        // documentation: FOV, aspect ratio, near, far.
+        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+ 
+        // dynamic uniform sending
+        int modelLoc = glGetUniformLocation(main_shader_3D.ID, "model");
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        int viewLoc = glGetUniformLocation(main_shader_3D.ID, "view");
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+        int projectionLoc = glGetUniformLocation(main_shader_3D.ID, "projection");
+        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+
 
         // uniform time
         float timeValue = glfwGetTime();
@@ -211,7 +243,7 @@ int main()
         // draw rectangle with changing color
         
         time_shader.use();
-
+        
         // uniforms
         time_shader.setVec3("vOffset", -redValue, -greenValue, -blueValue);
         time_shader.setVec4("timeColor", redValue,

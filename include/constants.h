@@ -15,3 +15,7 @@
 #define FRAG_FULL "shaders/full.fs"
 #define VERTEX_FULL "shaders/full.vs"
 #define FRAG_TIME_TEXTURED "shaders/time-textured.fs"
+
+// 3d shaders!!! (they use da matrices for transform)
+#define VERTEX_FULL_3D "shaders/full-3d.vs"
+#define VERTEX_TEXTURE_3D "shaders/nocolor-3d.vs"
