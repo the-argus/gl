@@ -8,7 +8,7 @@ UNIX_TARGET = triangle
 # compiler flags:
 #  -g     - this flag adds debugging information to the executable file
 #  -Wall  - this flag is used to turn on most compiler warnings
-UNIX_CCFLAGS = -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl
+UNIX_CCFLAGS = -g -Wall -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl
 WIN_CCFLAGS = -lglfw3 -lGdi32
 
 UNIX_INCLUDE = -I ./include/

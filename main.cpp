@@ -86,6 +86,10 @@ int main()
     
     // tell glfw to bind that func to resizing the window
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    
+    // global configuration
+    glEnable(GL_DEPTH_TEST);  
     
 
     
@@ -114,7 +118,7 @@ int main()
     Shader main_shader(VERTEX_FULL, FRAG_FULL);
 
     // the big boy
-    Shader main_shader_3D(VERTEX_FULL_3D, FRAG_FULL);
+    Shader main_shader_3D(VERTEX_TEXTURE_3D, FRAG_TEX);
 
     // 1. bind vertex array object
     glBindVertexArray(VAO);
@@ -169,6 +173,23 @@ int main()
             (void*)(3*sizeof(float)));
     glEnableVertexAttribArray(1);
 
+    // cube cube cube cube cube cube
+    unsigned int cVBO;
+    unsigned int cVAO;
+    glGenBuffers(1, &cVBO);
+    glGenVertexArrays(1, &cVAO);
+
+    glBindVertexArray(cVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, cVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices),
+            cube_vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float),
+            (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float),
+            (void*)(3*sizeof(float)));
+    glEnableVertexAttribArray(1);
+
     // TEXTURES -----------------------
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -204,36 +225,10 @@ int main()
         // configure color to fill the screen with upon clear
         glClearColor( 0.5f, 0.1f, 0.1f, 1.0f);
         // clear the screen buffer with color
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // RENDERING CODE ----------
         
-        // 3d cube!!
-
-        main_shader_3D.use();
-        
-        // plane rotation matrix
-        glm::mat4 model = glm::mat4(1.0f);
-        // rotate the moving rectangle backwards in 3d space
-        model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f)); 
-        // view matrix (move worldspace away from camera/ negative z)
-        glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); 
-        // PROJECTION MATRIX BAYBEE
-        glm::mat4 projection;
-        // documentation: FOV, aspect ratio, near, far.
-        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
- 
-        // dynamic uniform sending
-        int modelLoc = glGetUniformLocation(main_shader_3D.ID, "model");
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        int viewLoc = glGetUniformLocation(main_shader_3D.ID, "view");
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-        int projectionLoc = glGetUniformLocation(main_shader_3D.ID, "projection");
-        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-
-
-
         // uniform time
         float timeValue = glfwGetTime();
         float greenValue = (sin(timeValue*2) / 2.0f);
@@ -242,33 +237,33 @@ int main()
         
         // draw rectangle with changing color
         
-        time_shader.use();
-        
-        // uniforms
-        time_shader.setVec3("vOffset", -redValue, -greenValue, -blueValue);
-        time_shader.setVec4("timeColor", redValue,
-                greenValue, blueValue, 0.5f);
-        // texture
-        glBindTexture(GL_TEXTURE_2D, jaypehg);
-        // rectangle EBO
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        // time_shader.use();
 
-        // vertices
-        glBindVertexArray(rVAO);
+        // // uniforms
+        // time_shader.setVec3("vOffset", -redValue, -greenValue, -blueValue);
+        // time_shader.setVec4("timeColor", redValue,
+                // greenValue, blueValue, 0.5f);
+        // // texture
+        // glBindTexture(GL_TEXTURE_2D, jaypehg);
+        // // rectangle EBO
+        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+        // // vertices
+        // glBindVertexArray(rVAO);
+
+        // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        // glBindVertexArray(0);
         
 
         // box
-        main_shader.use();
-        
-        glBindTexture(GL_TEXTURE_2D, jaypehg);
-        glBindVertexArray(VAO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+        // main_shader.use();
+
+        // glBindTexture(GL_TEXTURE_2D, jaypehg);
+        // glBindVertexArray(VAO);
+        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+        // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        // glBindVertexArray(0);
         
         // draw yellow triangle
         yellow_shader.use();
@@ -278,6 +273,7 @@ int main()
         trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(
                     0.0, 0.0, 1.0));
         trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+        trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, -10.0f));
         // send the transformed matrix into a uniform called "transform"
         yellow_shader.setMat4("transform", trans);
  
@@ -287,6 +283,41 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glBindVertexArray(0); 
+
+
+        // 3d cube!! ===================
+
+        main_shader_3D.use();
+        
+        // plane rotation matrix
+        glm::mat4 model = glm::mat4(1.0f);
+        // rotate the moving rectangle backwards in 3d space
+        model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f)); 
+        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));  
+        // view matrix (move worldspace away from camera/ negative z)
+        glm::mat4 view = glm::mat4(1.0f);
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); 
+        // PROJECTION MATRIX BAYBEE
+        glm::mat4 projection;
+        // documentation: FOV, aspect ratio, near, far.
+        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+ 
+        // dynamic uniform sending
+        main_shader_3D.setMat4("projection", projection);
+        main_shader_3D.setMat4("view", view);
+        main_shader_3D.setMat4("model", model);
+        // int modelLoc = glGetUniformLocation(main_shader_3D.ID, "model");
+        // glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        // int viewLoc = glGetUniformLocation(main_shader_3D.ID, "view");
+        // glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+        // int projectionLoc = glGetUniformLocation(main_shader_3D.ID, "projection");
+        // glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+        
+        glBindTexture(GL_TEXTURE_2D, jaypehg);
+        glBindVertexArray(cVAO);
+        
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
         // END ---------------------
 
         // moves the buffer that is being drawn to into the window so it
