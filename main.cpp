@@ -10,6 +10,7 @@
 
 #include "constants.h"
 #include "shader.h"
+#include "player.h"
 
 // cube vertices
 #include "cube.h"
@@ -55,7 +56,7 @@ glm::vec3 cubePositions[] = {
 };
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow *window);
+void processInput(GLFWwindow *window, Player player);
 
 int main()
 {
@@ -230,10 +231,13 @@ int main()
     // free up memory
     stbi_image_free(data);
 
+    // create the player
+    Player player = Player();
+
     // enter window loop
     while(!glfwWindowShouldClose(window))
     {
-        processInput(window);
+        processInput(window, player);
         
         // configure color to fill the screen with upon clear
         glClearColor( 0.5f, 0.1f, 0.1f, 1.0f);
@@ -309,7 +313,13 @@ int main()
         // model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
         // view matrix (move worldspace away from camera/ negative z)
         glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); 
+        // create lookAT matrix (position, target, up vectors respectively)
+        view = glm::lookAt( player.pos,
+                            player.pos + player.dir,
+                            glm::vec3(0.0f, 1.0f, 0.0f));
+        //view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+
         // PROJECTION MATRIX BAYBEE
         glm::mat4 projection;
         // documentation: FOV, aspect ratio, near, far.
@@ -370,9 +380,21 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow *window)
+void processInput(GLFWwindow *window, Player player)
 {
     // one liner key handling
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    // movement/WASD
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    {
+        // move in direction that we're looking
+        player.Move(player.speed * player.dir);
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        // move away from direction that we're looking
+        player.Move(-player.speed * player.dir);
+    }
 }
