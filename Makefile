@@ -12,7 +12,7 @@ UNIX_CCFLAGS = -g -Wall -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl
 WIN_CCFLAGS = -lglfw3 -lGdi32
 
 UNIX_INCLUDE = -I include/
-WIN_INCLUDE = -I ./include/ -I "C:/Program Files (x86)/GLFW/include"
+WIN_INCLUDE = -I include/ -I "C:/Program Files (x86)/GLFW/include"
 
 UNIX_LINKFLAGS = 
 WIN_LINKFLAGS = -L"C:/Program Files (x86)/GLFW/lib"
@@ -89,12 +89,14 @@ $(info $$OBJECTS is [${OBJECTS}])
 all: obj $(TARGET)
 
 # link the project itself
-$(TARGET): $(OBJDIR)main.o $(OBJECTS) 
-	$(CC) $(SECONDARY_TARGETS) -o $(TARGET) $(OBJDIR)main.o $(OBJECTS) $(INCLUDE) $(LINKFLAGS) $(CCFLAGS)
+$(TARGET): $(OBJECTS) $(OBJDIR)main.o
+	$(CC) $(SECONDARY_TARGETS) $(OBJECTS) $(OBJDIR)main.o $(INCLUDE) -o $(TARGET) $(LINKFLAGS) $(CCFLAGS)
 
-# Compile every cpp file to an object, and also main
+# compile main.cpp
 $(OBJDIR)main.o: main.cpp
 	$(CC) -c $(CCFLAGS) -o $(OBJDIR)main.o main.cpp $(INCLUDE) $(LINKFLAGS)
+
+# Compile every cpp file to an object
 $(OBJDIR)%.o: $(SOURCE_FILES)
 	$(CC) -c $(CCFLAGS) -o $@ $< $(INCLUDE) $(LINKFLAGS)
 
