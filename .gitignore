@@ -1,3 +1,8 @@
+# bear and clangd
+.cache/
+clangd/
+compile_commands.json
+
 # my glfw source folder
 glfw/
 
