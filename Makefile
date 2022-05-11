@@ -11,7 +11,7 @@ UNIX_TARGET = triangle
 UNIX_CCFLAGS = -g -Wall -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl
 WIN_CCFLAGS = -lglfw3 -lGdi32
 
-UNIX_INCLUDE = -I ./include/
+UNIX_INCLUDE = -I include/
 WIN_INCLUDE = -I ./include/ -I "C:/Program Files (x86)/GLFW/include"
 
 UNIX_LINKFLAGS = 
@@ -74,7 +74,7 @@ endif
 # Subdirs to search for additional source files (all subdirs of SRCDIR)
 SUBDIRS := $(shell ls $(SRCDIR) -F | grep "\/" )
 # add root and the SRCDIR itself to the list of dirs to search
-DIRS := ./ $(SRCDIR) $(SUBDIRS)
+DIRS := $(SRCDIR) $(SUBDIRS)
 SOURCE_FILES := $(foreach dir, $(DIRS), $(wildcard $(dir)*.cpp) )
 
 $(info $$SOURCE_FILES is [${SOURCE_FILES}])
@@ -86,26 +86,23 @@ $(info $$OBJECTS is [${OBJECTS}])
 
 # building --------------------------------
 
-all: obj src $(TARGET)
+all: obj $(TARGET)
 
 # link the project itself
-$(TARGET): $(OBJECTS)
-	$(CC) $(SECONDARY_TARGETS) -o $(TARGET) $(OBJECTS) $(INCLUDE) $(LINKFLAGS) $(CCFLAGS)
+$(TARGET): $(OBJDIR)main.o $(OBJECTS) 
+	$(CC) $(SECONDARY_TARGETS) -o $(TARGET) $(OBJDIR)main.o $(OBJECTS) $(INCLUDE) $(LINKFLAGS) $(CCFLAGS)
 
-# Compile every cpp file to an object
-$(OBJDIR)%.o: %.cpp
+# Compile every cpp file to an object, and also main
+$(OBJDIR)main.o: main.cpp
+	$(CC) -c $(CCFLAGS) -o $(OBJDIR)main.o main.cpp $(INCLUDE) $(LINKFLAGS)
+$(OBJDIR)%.o: $(SOURCE_FILES)
 	$(CC) -c $(CCFLAGS) -o $@ $< $(INCLUDE) $(LINKFLAGS)
 
-
 obj:
-	mkdir -p $(OBJDIR)
-
-src:
-	mkdir -p $(SRCDIR)
+	mkdir obj
 
 clean:
-	$(RM) $(TARGET) $(OBJECTS) && rmdir $(OBJDIR)
+	$(RM) $(TARGET) $(OBJECTS) obj/main.o && rmdir $(OBJDIR)
 
 run: $(TARGET)
 	./$(TARGET) 
-
