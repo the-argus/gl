@@ -97,7 +97,7 @@ $(OBJDIR)main.o: main.cpp
 	$(CC) -c $(CCFLAGS) -o $(OBJDIR)main.o main.cpp $(INCLUDE) $(LINKFLAGS)
 
 # Compile every cpp file to an object
-$(OBJDIR)%.o: $(SOURCE_FILES)
+$(OBJDIR)%.o: $(SRCDIR)%.cpp
 	$(CC) -c $(CCFLAGS) -o $@ $< $(INCLUDE) $(LINKFLAGS)
 
 obj:
