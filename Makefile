@@ -71,40 +71,27 @@ LINKFLAGS = $(UNIX_LINKFLAGS)
     endif
 endif
 
-# Subdirs to search for additional source files (all subdirs of SRCDIR)
-SUBDIRS := $(shell ls $(SRCDIR) -F | grep "\/" )
-# add root and the SRCDIR itself to the list of dirs to search
-DIRS := $(SRCDIR) $(SUBDIRS)
-SOURCE_FILES := $(foreach dir, $(DIRS), $(wildcard $(dir)*.cpp) )
-
-$(info $$SOURCE_FILES is [${SOURCE_FILES}])
-
-# Create an object file of every cpp file
-OBJECTS := $(addprefix $(OBJDIR),$(patsubst %.cpp, %.o, $(shell basename -a $(SOURCE_FILES))))
-
-$(info $$OBJECTS is [${OBJECTS}])
-
 # building --------------------------------
 
 all: obj $(TARGET)
 
 # link the project itself
 $(TARGET): $(OBJECTS) $(OBJDIR)main.o
-	$(CC) $(SECONDARY_TARGETS) $(OBJECTS) $(OBJDIR)main.o $(INCLUDE) -o $(TARGET) $(LINKFLAGS) $(CCFLAGS)
+	$(CC) -o $(TARGET) $(SECONDARY_TARGETS) $(OBJECTS) $(OBJDIR)main.o $(INCLUDE) $(LINKFLAGS) $(CCFLAGS)
 
 # compile main.cpp
 $(OBJDIR)main.o: main.cpp
 	$(CC) -c $(CCFLAGS) -o $(OBJDIR)main.o main.cpp $(INCLUDE) $(LINKFLAGS)
 
 # Compile every cpp file to an object
-$(OBJDIR)%.o: $(SOURCE_FILES)
+$(OBJECTS): $(SOURCE_FILES)
 	$(CC) -c $(CCFLAGS) -o $@ $< $(INCLUDE) $(LINKFLAGS)
 
 obj:
 	mkdir obj
 
 clean:
-	$(RM) $(TARGET) $(OBJECTS) obj/main.o && rmdir $(OBJDIR)
+	$(RM) $(TARGET) $(OBJECTS) $(OBJDIR)main.o && rmdir $(OBJDIR)
 
 run: $(TARGET)
 	./$(TARGET) 
