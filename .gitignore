@@ -1,5 +1,13 @@
+# bear and clangd
+.cache/
+clangd/
+compile_commands.json
+
 # my glfw source folder
 glfw/
+
+# object files directory
+obj/
 
 # Prerequisites
 *.d
@@ -33,3 +41,4 @@ glfw/
 *.exe
 *.out
 *.app
+triangle
