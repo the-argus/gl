@@ -56,7 +56,7 @@ glm::vec3 cubePositions[] = {
 };
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow *window, Player player);
+void processInput(GLFWwindow *window, Player &player);
 
 int main()
 {
@@ -380,7 +380,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow *window, Player player)
+void processInput(GLFWwindow *window, Player &player)
 {
     // one liner key handling
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -396,5 +396,18 @@ void processInput(GLFWwindow *window, Player player)
     {
         // move away from direction that we're looking
         player.Move(-player.speed * player.dir);
+    }
+    
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        // move perpendicular to the direction that we're looking
+        player.Move(player.speed * glm::normalize(
+                    glm::cross(player.dir, player.up)));
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        // move opposite perpendicular to the direction that we're looking
+        player.Move(-player.speed * glm::normalize(
+                    glm::cross(player.dir, player.up)));
     }
 }
