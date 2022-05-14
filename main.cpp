@@ -387,27 +387,31 @@ void processInput(GLFWwindow *window, Player &player)
         glfwSetWindowShouldClose(window, true);
 
     // movement/WASD
+    glm::vec3 moveVec = glm::vec3(0.0f, 0.0f, 0.0f);
+
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
         // move in direction that we're looking
-        player.Move(player.speed * player.dir);
+        moveVec += player.dir;
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
         // move away from direction that we're looking
-        player.Move(-player.speed * player.dir);
+        moveVec -= player.dir;
     }
     
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
         // move perpendicular to the direction that we're looking
-        player.Move(player.speed * glm::normalize(
-                    glm::cross(player.dir, player.up)));
+        moveVec += glm::normalize(glm::cross(player.dir, player.up));
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
         // move opposite perpendicular to the direction that we're looking
-        player.Move(-player.speed * glm::normalize(
-                    glm::cross(player.dir, player.up)));
+        moveVec -= glm::normalize(glm::cross(player.dir, player.up));
+    }
+    
+    if (glm::length(moveVec) > 0) {
+        player.Move(player.speed * glm::normalize(moveVec));
     }
 }
