@@ -103,10 +103,10 @@ def build():
 
     if modified("main.cpp"):
         compilations.append([
-                conf.cc, "-c", ] + conf.ccflags + [
+                conf.cc, "-c",
                 "-o", main,  # target
                 "main.cpp",  # source
-                ] + conf.link + conf.include
+                ] + conf.link + conf.include + conf.ccflags
                 )
 
     # scan through source dir and sub directories, build all object files
@@ -123,10 +123,10 @@ def build():
             object = f"{os.path.join(conf.object_dir, prefix)}.o"
             if modified(fullname, file):
                 compilations.append([
-                        conf.cc, "-c"] + conf.ccflags +
-                        ["-o", object,  # target
-                         fullname,  # source
-                         ] + conf.link + conf.include
+                        conf.cc, "-c",
+                        "-o", object,  # target
+                        fullname,  # source
+                        ] + conf.link + conf.include + conf.ccflags
                         )
             objects.append(object)
 
