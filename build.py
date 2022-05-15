@@ -9,6 +9,7 @@
 # the compile_commands.json with bear.
 # Run "python build.py clean" to remove built
 # objects and executables.
+# Run "python build.py run" to run the executable.
 
 import sys
 import os
@@ -93,7 +94,8 @@ def execute(commands):
 
 def build():
     objects = []  # list of object files that get compiled
-    compilations = [["mkdir", conf.object_dir]]  # commands to run
+    execute([["mkdir", conf.object_dir]])  # setup commands
+    compilations = []  # commands to run
 
     # explicitly compile main.cpp (the only src file in the root dir)
     main = os.path.join(conf.object_dir, "main.o")
