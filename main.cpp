@@ -11,6 +11,7 @@
 #include "constants.h"
 #include "shader.h"
 #include "player.h"
+#include "input.h"
 
 // cube vertices
 #include "cube.h"
@@ -56,7 +57,12 @@ glm::vec3 cubePositions[] = {
 };
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void processInput(float deltaTime, GLFWwindow *window, Player &player);
+
+Input input = Input();
+// create the player
+Player player = Player();
 
 int main()
 {
@@ -101,9 +107,13 @@ int main()
     // tell glfw to bind that func to resizing the window
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+    // bind mouse mouse_callback
+    glfwSetCursorPosCallback(window, mouse_callback);
+
     
     // global configuration
-    glEnable(GL_DEPTH_TEST);  
+    glEnable(GL_DEPTH_TEST);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //mouse input
     
 
     
@@ -230,10 +240,7 @@ int main()
 
     // free up memory
     stbi_image_free(data);
-
-    // create the player
-    Player player = Player();
-    
+ 
     // delta time setup
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
@@ -323,7 +330,7 @@ int main()
         glm::mat4 view = glm::mat4(1.0f);
         // create lookAT matrix (position, target, up vectors respectively)
         view = glm::lookAt( player.pos,
-                            player.pos + player.dir,
+                            player.pos + player.getDir(),
                             glm::vec3(0.0f, 1.0f, 0.0f));
         //view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 
@@ -403,26 +410,53 @@ void processInput(float deltaTime, GLFWwindow *window, Player &player)
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
         // move in direction that we're looking
-        moveVec += player.dir;
+        moveVec += player.getDir();
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
         // move away from direction that we're looking
-        moveVec -= player.dir;
+        moveVec -= player.getDir();
     }
     
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
         // move perpendicular to the direction that we're looking
-        moveVec += glm::normalize(glm::cross(player.dir, player.up));
+        moveVec += glm::normalize(glm::cross(player.getDir(), player.up));
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
         // move opposite perpendicular to the direction that we're looking
-        moveVec -= glm::normalize(glm::cross(player.dir, player.up));
+        moveVec -= glm::normalize(glm::cross(player.getDir(), player.up));
     }
     
     if (glm::length(moveVec) > 0) {
         player.Move(player.speed * glm::normalize(moveVec) * deltaTime);
+    }
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if (input.first_mouse)
+    {
+        input.mouse_last_x = xpos;
+        input.mouse_last_y = ypos;
+        input.first_mouse = false;
+    }
+
+    float delta_x = xpos - input.mouse_last_x;
+    float delta_y = ypos - input.mouse_last_y;
+    input.mouse_last_x = xpos;
+    input.mouse_last_y = ypos;
+
+    delta_x *= input.sensitivity;
+    delta_y *= input.sensitivity;
+    
+    if (input.invert_y_axis)
+    {
+        player.Rotate(delta_y, delta_x);
+    }
+    else
+    {
+        player.Rotate(-delta_y, delta_x);
     }
 }

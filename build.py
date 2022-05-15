@@ -148,7 +148,7 @@ def build():
 def clean():
     commands = [
             ["rm", "-rf", conf.object_dir],
-            ["rm", conf.target]
+            ["rm", conf.target, CACHEFILE],
             ]
 
     execute(commands)
