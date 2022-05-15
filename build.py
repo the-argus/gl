@@ -40,7 +40,7 @@ class Configuration():
         """windows build configuration"""
         self.target = "gl.exe"
         self.ccflags = ["-g", "-Wall", "-lglfw3", "-lGdi32"]
-        self.link = ["-L\"C:/Program Files (x86)/GLFW/lib\""]
+        self.link = ["-L", "\"C:/Program Files (x86)/GLFW/lib\""]
         self.include = ["-I", "include/",
                         "-I", "\"C:/Program Files (x86)/GLFW/include\""]
 
