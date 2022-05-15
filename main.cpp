@@ -56,7 +56,7 @@ glm::vec3 cubePositions[] = {
 };
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow *window, Player &player);
+void processInput(float deltaTime, GLFWwindow *window, Player &player);
 
 int main()
 {
@@ -233,11 +233,19 @@ int main()
 
     // create the player
     Player player = Player();
+    
+    // delta time setup
+    float deltaTime = 0.0f;
+    float lastFrame = 0.0f;
 
     // enter window loop
     while(!glfwWindowShouldClose(window))
     {
-        processInput(window, player);
+        // calculate delta time for this step
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+
+        processInput(deltaTime, window, player);
         
         // configure color to fill the screen with upon clear
         glClearColor( 0.5f, 0.1f, 0.1f, 1.0f);
@@ -361,7 +369,10 @@ int main()
 
         // checks if any events like window resizing or
         // button presses happen
-        glfwPollEvents();    
+        glfwPollEvents();
+
+        // update the time of the previous frame to be this one
+        lastFrame = currentFrame;
     }
     
     // cleanup glfw's allocated resources
@@ -380,7 +391,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow *window, Player &player)
+void processInput(float deltaTime, GLFWwindow *window, Player &player)
 {
     // one liner key handling
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -412,6 +423,6 @@ void processInput(GLFWwindow *window, Player &player)
     }
     
     if (glm::length(moveVec) > 0) {
-        player.Move(player.speed * glm::normalize(moveVec));
+        player.Move(player.speed * glm::normalize(moveVec) * deltaTime);
     }
 }
