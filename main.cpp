@@ -60,8 +60,8 @@ int main()
 	glEnableVertexAttribArray(1);
 
 	// unbind
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	// glBindBuffer(GL_ARRAY_BUFFER, 0);
+	// glBindVertexArray(0);
 
 	Shader basic_3D =
 		Shader("shaders/passthrough.vs", "shaders/passthrough.fs");
@@ -85,7 +85,7 @@ int main()
     
     // perspective projection matrix
 	glm::mat4 projection = glm::perspective(
-		glm::radians(90.0f), (float)WINDOW_HEIGHT / (float)WINDOW_HEIGHT, 0.1f,
+		glm::radians(45.0f), (float)WINDOW_HEIGHT / (float)WINDOW_HEIGHT, 0.1f,
 		100.0f);
     
     // translations performed on the cube
@@ -96,6 +96,8 @@ int main()
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); 
 
     basic_3D.setMat4("projection", projection);
+    basic_3D.setMat4("model", model);
+        basic_3D.setMat4("view", view);
     
     // basic_3D.use();
     // basic_3D.setInt("ourTexture", 0);
@@ -105,8 +107,6 @@ int main()
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        basic_3D.setMat4("view", view);
-        basic_3D.setMat4("model", model);
 		basic_3D.use();
 		glBindTexture(GL_TEXTURE_2D, containerTex);
 		glBindVertexArray(VAO);
