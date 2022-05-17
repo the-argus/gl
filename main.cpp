@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include "constants.h"
+#include "cube.h"
 
 // function called whenever a user resizes the window
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
@@ -36,17 +37,22 @@ int main()
 	// tell opengl the size of the viewport, which we just created with GLFW
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
+	unsigned int VBO;
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices,
+				 GL_STATIC_DRAW);
+
 	// window's update loop
 	while (!glfwWindowShouldClose(window)) {
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-    
-    glfwTerminate();
+
+	glfwTerminate();
 	return 0;
 }
 
