@@ -39,6 +39,8 @@ int main()
 	// tell opengl the size of the viewport, which we just created with GLFW
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
     glEnable(GL_DEPTH_TEST);
+	Shader basic_3D =
+		Shader("shaders/passthrough.vs", "shaders/passthrough.fs");
 
 	// initialize vertex buffer and array objects
 	unsigned int VBO;
@@ -54,18 +56,15 @@ int main()
 	// create vertex attributes for cube
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
 						  (void *)0);
+	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
 						  (void *)3);
-	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 
 	// unbind
 	// glBindBuffer(GL_ARRAY_BUFFER, 0);
 	// glBindVertexArray(0);
-
-	Shader basic_3D =
-		Shader("shaders/passthrough.vs", "shaders/passthrough.fs");
-    
+ 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     // set texture filtering parameters
@@ -89,33 +88,30 @@ int main()
 
 	stbi_image_free(data);
     
+    // initialize to identitiy matrix
+    glm::mat4 projection = glm::mat4(1.0f);
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view = glm::mat4(1.0f);
     // perspective projection matrix
-	glm::mat4 projection = glm::perspective(
+	projection = glm::perspective(
 		glm::radians(45.0f), (float)WINDOW_HEIGHT / (float)WINDOW_HEIGHT, 0.1f,
 		100.0f);
     
-    // translations performed on the cube
-    glm::mat4 model = glm::mat4(1.0f);
-    
     // translations performed on the camera
-    glm::mat4 view = glm::mat4(1.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); 
-
-    basic_3D.setMat4("projection", projection);
-    basic_3D.setMat4("model", model);
-        basic_3D.setMat4("view", view);
-    
-    // basic_3D.use();
-    // basic_3D.setInt("ourTexture", 0);
-
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, 3.0f)); 
+ 
 	// window's update loop
 	while (!glfwWindowShouldClose(window)) {
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
+		
+        glBindTexture(GL_TEXTURE_2D, containerTex);
 		basic_3D.use();
-		glBindTexture(GL_TEXTURE_2D, containerTex);
-		glBindVertexArray(VAO);
+        basic_3D.setMat4("projection", projection);
+        basic_3D.setMat4("model", model);
+        basic_3D.setMat4("view", view);
+		
+        glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		glfwSwapBuffers(window);
