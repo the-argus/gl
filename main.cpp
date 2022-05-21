@@ -38,7 +38,7 @@ int main()
 
 	// tell opengl the size of the viewport, which we just created with GLFW
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-    glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 	Shader basic_3D =
 		Shader("shaders/passthrough.vs", "shaders/passthrough.fs");
 
@@ -64,12 +64,14 @@ int main()
 	// unbind
 	// glBindBuffer(GL_ARRAY_BUFFER, 0);
 	// glBindVertexArray(0);
- 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+					GL_REPEAT); // set texture wrapping to GL_REPEAT (default
+								// wrapping method)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// set texture filtering parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	// load texture for the cube
 	int width, height, nrChannels;
@@ -87,31 +89,43 @@ int main()
 				 GL_UNSIGNED_BYTE, data);
 
 	stbi_image_free(data);
-    
-    // initialize to identitiy matrix
-    glm::mat4 projection = glm::mat4(1.0f);
-    glm::mat4 model = glm::mat4(1.0f);
-    glm::mat4 view = glm::mat4(1.0f);
-    // perspective projection matrix
-	projection = glm::perspective(
-		glm::radians(45.0f), (float)WINDOW_HEIGHT / (float)WINDOW_HEIGHT, 0.1f,
-		100.0f);
-    
-    // translations performed on the camera
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, 3.0f)); 
- 
+
+	// initialize to identitiy matrix
+	glm::mat4 projection = glm::mat4(1.0f);
+	glm::mat4 model = glm::mat4(1.0f);
+	glm::mat4 view = glm::mat4(1.0f);
+	// perspective projection matrix
+	projection = glm::perspective(glm::radians(45.0f),
+								  (float)WINDOW_HEIGHT / (float)WINDOW_HEIGHT,
+								  0.1f, 100.0f);
+
+	// translations performed on the model
+	glm::mat4 cube = glm::translate(model, glm::vec3(0.0f, 0.0f, -10.0f));
+	glm::mat4 lightcube = glm::translate(model, glm::vec3(1.5f, 1.0f, -10.0f));
+	lightcube = glm::rotate(lightcube, glm::radians(45.0f),
+							glm::vec3(1.0f, 1.0f, 0.0f));
+
+	// translations performed on the camera
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, 3.0f));
+
 	// window's update loop
 	while (!glfwWindowShouldClose(window)) {
 		glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-        glBindTexture(GL_TEXTURE_2D, containerTex);
+
+		glBindTexture(GL_TEXTURE_2D, containerTex);
 		basic_3D.use();
-        basic_3D.setMat4("projection", projection);
-        basic_3D.setMat4("model", model);
-        basic_3D.setMat4("view", view);
+		basic_3D.setMat4("projection", projection);
+		basic_3D.setMat4("view", view);
+
+		glBindVertexArray(VAO);
 		
-        glBindVertexArray(VAO);
+        // draw cube
+        basic_3D.setMat4("model", cube);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // draw lightcube
+        basic_3D.setMat4("model", lightcube);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		glfwSwapBuffers(window);
