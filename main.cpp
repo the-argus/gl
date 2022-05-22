@@ -81,12 +81,14 @@ int main()
 		std::cout << "FAILED TO LOAD TEXTURE" << std::endl;
 		return -1;
 	}
+
 	// register with opengl
 	unsigned int containerTex;
 	glGenTextures(1, &containerTex);
 	glBindTexture(GL_TEXTURE_2D, containerTex);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
 				 GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
 
 	stbi_image_free(data);
 
@@ -113,12 +115,12 @@ int main()
 		glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glBindTexture(GL_TEXTURE_2D, containerTex);
 		basic_3D.use();
 		basic_3D.setMat4("projection", projection);
 		basic_3D.setMat4("view", view);
 
 		glBindVertexArray(VAO);
+		glBindTexture(GL_TEXTURE_2D, containerTex);
 		
         // draw cube
         basic_3D.setMat4("model", cube);
