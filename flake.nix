@@ -1,10 +1,10 @@
-{ pkgs ? import <nixpkgs> {} }:
+#{ pkgs ? import <nixpkgs> {} }:
 {
   description = "openGL practice project";
 
   inputs = {
-    #nixpkgs.url = "nixpkgs/nixos-21.11";
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "nixpkgs/nixos-21.11";
+    #nixpkgs.url = "nixpkgs/nixos-unstable";
   };
 
   outputs = { self, nixpkgs, ... }@inputs:
@@ -13,8 +13,8 @@
     in
     {
         devShell.${system} =
-            pkgs.mkShell { 
-                nativeBuildInputs = with pkgs; [
+            nixpkgs.mkShell { 
+                nativeBuildInputs = with nixpkgs; [
                     gcc
                     python
                     bear
