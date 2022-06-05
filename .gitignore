@@ -1,3 +1,6 @@
+# nix
+result/
+
 # bear and clangd
 .cache/
 clangd/
