@@ -23,7 +23,7 @@
         devShell.${system} =
             pkgs.mkShell {
                 shellHook = ''
-alias build=python build.py
+alias build="python build.py"
 # get access to neovim while in devshell
 alias nvim=${pkgs.neovim}/bin/nvim
                 '';
@@ -33,7 +33,7 @@ alias nvim=${pkgs.neovim}/bin/nvim
                     bear
 
                     # libraries
-                    glfw-wayland
+                    glfw3
                     xorg.libXrandr
                     xorg.libXi
                     xorg.libX11

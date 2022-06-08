@@ -28,7 +28,7 @@ class Configuration():
         self.object_dir = "obj"
         self.cc = "g++"
         self.target = "gl"
-        self.ccflags = ["-g", "-Wall", "-lglfw3", "-lGL", "-lX11",
+        self.ccflags = ["-g", "-Wall", "-lglfw", "-lGL", "-lX11",
                         "-lpthread", "-lXrandr", "-lXi", "-ldl"]
         self.include = ["-I", "include/"]
         self.link = []
