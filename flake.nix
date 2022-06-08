@@ -22,7 +22,7 @@
         #};
         devShell.${system} =
             pkgs.mkShell {
-                shellHoook = ''
+                shellHook = ''
 alias build=python build.py
 # get access to neovim while in devshell
 alias nvim=${pkgs.neovim}/bin/nvim
