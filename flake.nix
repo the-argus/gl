@@ -3,14 +3,15 @@
   description = "openGL practice project";
 
   inputs = {
-    #nixpkgs.url = "nixpkgs/nixos-21.11";
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "nixpkgs/nixos-22.05";
+    nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
   };
 
-  outputs = { self, nixpkgs, ... }@inputs:
+  outputs = { self, nixpkgs, nixpkgs-unstable, ... }@inputs:
     let
         system = "x86_64-linux";
         pkgs = import nixpkgs { inherit system; };
+      unstable = nixpkgs-unstable.legacyPackages.${system};
     in
     {
         #defaultPackage.${system} = 
@@ -24,10 +25,9 @@
             pkgs.mkShell {
                 shellHook = ''
 alias build="python build.py"
-# get access to neovim while in devshell
-alias nvim=${pkgs.neovim}/bin/nvim
                 '';
                 nativeBuildInputs = with pkgs; [
+                    unstable.neovim
                     gcc
                     python3Minimal
                     bear
