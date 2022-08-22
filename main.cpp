@@ -41,7 +41,7 @@ int main()
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	glEnable(GL_DEPTH_TEST);
 	Shader basic_3D("shaders/passthrough.vs", "shaders/passthrough.fs");
-    Shader light_3D("shaders/textured.vs", "shaders/light.fs");
+    Shader light_3D("shaders/passthrough.vs", "shaders/light.fs");
     Shader lighted_3D("shaders/textured.vs", "shaders/lighted.fs");
 
 	// initialize vertex buffer and array objects
@@ -50,8 +50,8 @@ int main()
 	glGenVertexArrays(1, &VAO);
 	// bind the VAO and VBO so they start recording the openGL state
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices,
-				 GL_STATIC_DRAW);
+	// glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices,
+	// 			 GL_STATIC_DRAW);
 	glBindVertexArray(VAO);
 
 	// create vertex attributes for cube
@@ -62,17 +62,19 @@ int main()
 						  (void *)3);
 	glEnableVertexAttribArray(1);
 
-	unsigned int lightcube_VAO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(lightcube_VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-						  (void *)0);
-    glEnableVertexAttribArray(0);
+	// unsigned int lightcube_VAO;
+	// glGenVertexArrays(1, &VAO);
+	// glBindVertexArray(lightcube_VAO);
+	// glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	// glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+	// 					  (void *)0);
+	// glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+	// 					  (void *)3);
+ //    glEnableVertexAttribArray(0);
 
 	// unbind
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	// glBindBuffer(GL_ARRAY_BUFFER, 0);
+	// glBindVertexArray(0);
 
 	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
 	// 				GL_REPEAT); // set texture wrapping to GL_REPEAT (default
@@ -143,7 +145,7 @@ int main()
 		// light_3D.setMat4("view", view);
 		// light_3D.setMat4("model", lightcube);
 		basic_3D.setMat4("model", lightcube);
-        glBindVertexArray(lightcube_VAO);
+        // glBindVertexArray(lightcube_VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		glfwSwapBuffers(window);
@@ -155,7 +157,7 @@ int main()
 	glDeleteProgram(light_3D.ID);
 	glDeleteBuffers(1, &VBO);
 	glDeleteVertexArrays(1, &VAO);
-	glDeleteVertexArrays(1, &lightcube_VAO);
+	// glDeleteVertexArrays(1, &lightcube_VAO);
 
 	glfwTerminate();
 	return 0;
