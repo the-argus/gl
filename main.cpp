@@ -30,7 +30,7 @@ int main()
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "Failed to initialize GLAD" << std::endl;
@@ -41,8 +41,8 @@ int main()
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	glEnable(GL_DEPTH_TEST);
 	Shader basic_3D("shaders/passthrough.vs", "shaders/passthrough.fs");
-    Shader light_3D("shaders/passthrough.vs", "shaders/light.fs");
-    Shader lighted_3D("shaders/textured.vs", "shaders/lighted.fs");
+	Shader light_3D("shaders/passthrough.vs", "shaders/light.fs");
+	Shader lighted_3D("shaders/textured.vs", "shaders/lighted.fs");
 
 	// initialize vertex buffer and array objects
 	unsigned int VBO, VAO;
@@ -70,7 +70,7 @@ int main()
 	// 					  (void *)0);
 	// glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
 	// 					  (void *)3);
- //    glEnableVertexAttribArray(0);
+	//    glEnableVertexAttribArray(0);
 
 	// unbind
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -117,7 +117,7 @@ int main()
 	glm::mat4 lightcube = glm::translate(model, glm::vec3(1.5f, 1.0f, -10.0f));
 	lightcube = glm::rotate(lightcube, glm::radians(45.0f),
 							glm::vec3(1.0f, 1.0f, 0.0f));
-    lightcube = glm::scale(lightcube, glm::vec3(0.2f));
+	lightcube = glm::scale(lightcube, glm::vec3(0.2f));
 
 	// translations performed on the camera
 	view = glm::translate(view, glm::vec3(0.0f, 0.0f, 3.0f));
@@ -130,7 +130,7 @@ int main()
 		basic_3D.use();
 		basic_3D.setMat4("projection", projection);
 		basic_3D.setMat4("view", view);
-        // basic_3D.setVec3("lightColor", 1.0, 1.0, 1.0);
+		// basic_3D.setVec3("lightColor", 1.0, 1.0, 1.0);
 
 		glBindVertexArray(VAO);
 		// glBindTexture(GL_TEXTURE_2D, containerTex);
@@ -145,7 +145,7 @@ int main()
 		light_3D.setMat4("view", view);
 		light_3D.setMat4("model", lightcube);
 		basic_3D.setMat4("model", lightcube);
-        // glBindVertexArray(lightcube_VAO);
+		// glBindVertexArray(lightcube_VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		glfwSwapBuffers(window);
