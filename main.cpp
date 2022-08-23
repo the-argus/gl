@@ -50,8 +50,8 @@ int main()
 	glGenVertexArrays(1, &VAO);
 	// bind the VAO and VBO so they start recording the openGL state
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	// glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices,
-	// 			 GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices,
+				 GL_STATIC_DRAW);
 	glBindVertexArray(VAO);
 
 	// create vertex attributes for cube
@@ -73,35 +73,35 @@ int main()
  //    glEnableVertexAttribArray(0);
 
 	// unbind
-	// glBindBuffer(GL_ARRAY_BUFFER, 0);
-	// glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 
-	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-	// 				GL_REPEAT); // set texture wrapping to GL_REPEAT (default
-	// 							// wrapping method)
-	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// // set texture filtering parameters
-	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+					GL_REPEAT); // set texture wrapping to GL_REPEAT (default
+								// wrapping method)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// set texture filtering parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	// load texture for the cube
-	// int width, height, nrChannels;
-	// unsigned char *data =
-	// 	stbi_load("container.jpg", &width, &height, &nrChannels, 0);
-	// if (!data) {
-	// 	std::cout << "FAILED TO LOAD TEXTURE" << std::endl;
-	// 	return -1;
-	// }
-	//
-	// // register with opengl
-	// unsigned int containerTex;
-	// glGenTextures(1, &containerTex);
-	// glBindTexture(GL_TEXTURE_2D, containerTex);
-	// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-	// 			 GL_UNSIGNED_BYTE, data);
-	// glGenerateMipmap(GL_TEXTURE_2D);
-	//
-	// stbi_image_free(data);
+	int width, height, nrChannels;
+	unsigned char *data =
+		stbi_load("container.jpg", &width, &height, &nrChannels, 0);
+	if (!data) {
+		std::cout << "FAILED TO LOAD TEXTURE" << std::endl;
+		return -1;
+	}
+
+	// register with opengl
+	unsigned int containerTex;
+	glGenTextures(1, &containerTex);
+	glBindTexture(GL_TEXTURE_2D, containerTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+				 GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	stbi_image_free(data);
 
 	// initialize to identity matrix
 	glm::mat4 projection = glm::mat4(1.0f);
@@ -140,10 +140,10 @@ int main()
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		// draw lightcube
-		// light_3D.use();
-		// light_3D.setMat4("projection", projection);
-		// light_3D.setMat4("view", view);
-		// light_3D.setMat4("model", lightcube);
+		light_3D.use();
+		light_3D.setMat4("projection", projection);
+		light_3D.setMat4("view", view);
+		light_3D.setMat4("model", lightcube);
 		basic_3D.setMat4("model", lightcube);
         // glBindVertexArray(lightcube_VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
