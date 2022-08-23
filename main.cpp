@@ -62,15 +62,15 @@ int main()
 						  (void *)3);
 	glEnableVertexAttribArray(1);
 
-	// unsigned int lightcube_VAO;
-	// glGenVertexArrays(1, &VAO);
-	// glBindVertexArray(lightcube_VAO);
-	// glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	// glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-	// 					  (void *)0);
-	// glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-	// 					  (void *)3);
-	//    glEnableVertexAttribArray(0);
+	unsigned int lightcube_VAO;
+	glGenVertexArrays(1, &lightcube_VAO);
+	glBindVertexArray(lightcube_VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+						  (void *)0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+						  (void *)3);
+	glEnableVertexAttribArray(0);
 
 	// unbind
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -145,7 +145,7 @@ int main()
 		light_3D.setMat4("view", view);
 		light_3D.setMat4("model", lightcube);
 		basic_3D.setMat4("model", lightcube);
-		// glBindVertexArray(lightcube_VAO);
+		glBindVertexArray(lightcube_VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		glfwSwapBuffers(window);
