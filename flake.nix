@@ -1,43 +1,39 @@
-#{ pkgs ? import <nixpkgs> {} }:
 {
   description = "openGL practice project";
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-22.05";
-    nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, ... }@inputs:
+  outputs = { self, nixpkgs, ... }@inputs:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
-      unstable = nixpkgs-unstable.legacyPackages.${system};
+      llvm = pkgs.llvmPackages_latest;
     in
     {
-      #defaultPackage.${system} = 
-      #stdenv.mkDerivation {
-      #    name = "glportals";
-      #    src = self;
-      #    buildPhase = "python build.py";
-      #    # installPhase = "...
-      #};
-      devShell.${system} =
-        pkgs.mkShell {
-          shellHook = ''
-            alias build="python build.py"
-          '';
-          nativeBuildInputs = with pkgs; [
-            unstable.neovim
-            gcc
-            python3Minimal
-            bear
+      devShell.${system} = pkgs.mkShell.override { stdenv = pkgs.clangStdenv; } rec {
+        nativeBuildInputs = with pkgs; [
+          python3Minimal
+          bear
+          clang
+          clang-tools
+          
+          # debugger
+          llvm.lldb
+          gdb
 
-            # libraries
-            glfw3
-            xorg.libXrandr
-            xorg.libXi
-            xorg.libX11
-          ];
-        };
+          # lsp and std lib
+          llvm.libstdcxxClang
+
+          # libraries
+          llvm.libcxx
+          llvm.libllvm
+          glfw3
+          xorg.libXrandr
+          xorg.libXi
+          xorg.libX11
+        ];
+      };
     };
 }

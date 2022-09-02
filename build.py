@@ -26,11 +26,13 @@ class Configuration():
         self.secondary_targets = os.path.join("deps", "glad.c")
         self.source_dir = "src"
         self.object_dir = "obj"
-        self.cc = "g++"
+        # self.cc = "g++"
+        self.cc = "clang++"
         self.target = "gl"
-        self.ccflags = ["-g", "-Wall", "-lglfw", "-lGL", "-lX11",
-                        "-lpthread", "-lXrandr", "-lXi", "-ldl"]
+        self.ccflags = ["-g", "-Wall" ]
         self.include = ["-I", "include/"]
+        self.linkflags = [ "-lglfw", "-lGL", "-lX11",
+                        "-lpthread", "-lXrandr", "-lXi", "-ldl" ]
         self.link = []
 
         if os.name == "nt":
@@ -110,7 +112,7 @@ def build():
                 )
 
     # scan through source dir and sub directories, build all object files
-    for root, dir, files in os.walk(conf.source_dir):
+    for root, _, files in os.walk(conf.source_dir):
         for file in files:
             if file[-4:] != ".cpp":
                 continue
@@ -130,10 +132,11 @@ def build():
                         )
             objects.append(object)
 
-    # link the final executable
+    # link the final executable (include linkflags)
     compilations.append([
             conf.cc, conf.secondary_targets, "-o", conf.target,
-            ] + objects + conf.include + conf.link + conf.ccflags
+            ] + objects + conf.include + conf.linkflags + 
+              conf.link + conf.ccflags
             )
 
     # compile everything
@@ -167,6 +170,8 @@ if __name__ == "__main__":
         build_compile_commands = sys.argv[1]
 
         if build_compile_commands == "commands":
+            print("cleaning previous build...")
+            clean()
             print("Building compile_commands.json...")
             os.system('bear --output compile_commands.json'
                       ' -- python build.py')
@@ -180,7 +185,9 @@ if __name__ == "__main__":
             run()
 
         else:
-            raise AttributeError(f"unknown argument {build_compile_commands}")
+            raise AttributeError(f"unknown subcommand {build_compile_commands}. \
+                    Valid subcommands are: \n\tcommands\n\tclean\n\trun\n\
+                    You can also specify no subcommand to build the project.")
     except IndexError:
         print("Building project...")
         build()

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -55,21 +56,22 @@ int main()
 	glBindVertexArray(VAO);
 
 	// create vertex attributes for cube
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
 						  (void *)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-						  (void *)3);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+						  (void *)(3*sizeof(float)));
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+						  (void *)(6*sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	unsigned int lightcube_VAO;
 	glGenVertexArrays(1, &lightcube_VAO);
 	glBindVertexArray(lightcube_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
 						  (void *)0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-						  (void *)3);
 	glEnableVertexAttribArray(0);
 
 	// unbind
@@ -114,6 +116,7 @@ int main()
 
 	// translations performed on the model
 	glm::mat4 cube = glm::translate(model, glm::vec3(0.0f, 0.0f, -10.0f));
+	cube = glm::rotate(cube, glm::radians(30.0f), glm::vec3(-1.0f, 1.0f, 0.0f));
 	glm::mat4 lightcube = glm::translate(model, glm::vec3(1.5f, 1.0f, -10.0f));
 	lightcube = glm::rotate(lightcube, glm::radians(45.0f),
 							glm::vec3(1.0f, 1.0f, 0.0f));
@@ -127,16 +130,20 @@ int main()
 		glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		basic_3D.use();
-		basic_3D.setMat4("projection", projection);
-		basic_3D.setMat4("view", view);
-		// basic_3D.setVec3("lightColor", 1.0, 1.0, 1.0);
+		lighted_3D.use();
+		lighted_3D.setMat4("projection", projection);
+		lighted_3D.setMat4("view", view);
+		lighted_3D.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        lighted_3D.setFloat("ambientStrength", 0.1f);
+        lighted_3D.setFloat("diffuseStrength", 10.0f);
+        glm::vec3 lp = glm::vec3(lightcube[3]);
+        lighted_3D.setVec3("lightPos", lp.x, lp.y, lp.z);
 
 		glBindVertexArray(VAO);
-		// glBindTexture(GL_TEXTURE_2D, containerTex);
+		glBindTexture(GL_TEXTURE_2D, containerTex);
 
 		// draw cube
-		basic_3D.setMat4("model", cube);
+		lighted_3D.setMat4("model", cube);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		// draw lightcube
@@ -144,9 +151,18 @@ int main()
 		light_3D.setMat4("projection", projection);
 		light_3D.setMat4("view", view);
 		light_3D.setMat4("model", lightcube);
-		basic_3D.setMat4("model", lightcube);
 		glBindVertexArray(lightcube_VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		float time = glfwGetTime();
+		float radius = 5.0f;
+		float s = sin(time) * radius;
+		float c = cos(time) * radius;
+        glm::vec3 target = glm::vec3(cube[3]);
+        // circle target around x and z
+		glm::vec3 pos = glm::vec3(target.x + s, target.y, target.z + c);
+		view =
+			glm::lookAt(pos, target, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -157,7 +173,7 @@ int main()
 	glDeleteProgram(light_3D.ID);
 	glDeleteBuffers(1, &VBO);
 	glDeleteVertexArrays(1, &VAO);
-	// glDeleteVertexArrays(1, &lightcube_VAO);
+	glDeleteVertexArrays(1, &lightcube_VAO);
 
 	glfwTerminate();
 	return 0;
