@@ -18,7 +18,7 @@
           bear
           clang
           clang-tools
-          
+
           # debugger
           llvm.lldb
           gdb
@@ -27,6 +27,7 @@
           llvm.libstdcxxClang
 
           # libraries
+          assimp
           llvm.libcxx
           llvm.libllvm
           glfw3
