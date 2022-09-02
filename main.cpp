@@ -11,6 +11,7 @@
 
 // function called whenever a user resizes the window
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+unsigned int loadTexture(char const *path);
 
 int main()
 {
@@ -59,11 +60,11 @@ int main()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
 						  (void *)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-						  (void *)(3*sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+						  (void *)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-						  (void *)(6*sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+						  (void *)(7 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
 	unsigned int lightcube_VAO;
@@ -77,33 +78,13 @@ int main()
 	// unbind
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-					GL_REPEAT); // set texture wrapping to GL_REPEAT (default
-								// wrapping method)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// set texture filtering parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	// load texture for the cube
-	int width, height, nrChannels;
-	unsigned char *data =
-		stbi_load("container.jpg", &width, &height, &nrChannels, 0);
-	if (!data) {
-		std::cout << "FAILED TO LOAD TEXTURE" << std::endl;
-		return -1;
-	}
-
-	// register with opengl
-	unsigned int containerTex;
-	glGenTextures(1, &containerTex);
-	glBindTexture(GL_TEXTURE_2D, containerTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-				 GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	stbi_image_free(data);
+    
+	unsigned int containerTex =
+		loadTexture("container2.png");
+	unsigned int specularMap =
+		loadTexture("container2_specular.png");
+    lighted_3D.setInt("diffuseTexture", 0);
+    lighted_3D.setInt("specularMap", 1);
 
 	// initialize to identity matrix
 	glm::mat4 projection = glm::mat4(1.0f);
@@ -118,7 +99,7 @@ int main()
 	glm::mat4 cube = glm::translate(model, glm::vec3(0.0f, 0.0f, -10.0f));
 	cube = glm::rotate(cube, glm::radians(30.0f), glm::vec3(-1.0f, 1.0f, 0.0f));
 
-    glm::vec3 lightPos = glm::vec3(1.5f, 1.0f, -10.0f);
+	glm::vec3 lightPos = glm::vec3(1.5f, 1.0f, -10.0f);
 	glm::mat4 lightcube = glm::translate(model, lightPos);
 	lightcube = glm::rotate(lightcube, glm::radians(45.0f),
 							glm::vec3(1.0f, 1.0f, 0.0f));
@@ -131,30 +112,32 @@ int main()
 	while (!glfwWindowShouldClose(window)) {
 		glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-        float time = glfwGetTime();
+
+		float time = glfwGetTime();
 		float radius = 5.0f;
 		float s = sin(time) * radius;
 		float c = cos(time) * radius;
-        glm::vec3 target = glm::vec3(cube[3]);
-        // circle target around x and z
+		glm::vec3 target = glm::vec3(cube[3]);
+		// circle target around x and z
 		glm::vec3 pos = glm::vec3(target.x + s, target.y, target.z + c);
-		view =
-			glm::lookAt(pos, target, glm::vec3(0.0f, 1.0f, 0.0f));
+		view = glm::lookAt(pos, target, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		lighted_3D.use();
 		lighted_3D.setMat4("projection", projection);
 		lighted_3D.setMat4("view", view);
 		lighted_3D.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-        lighted_3D.setFloat("ambientStrength", 0.1f);
-        lighted_3D.setFloat("diffuseStrength", 1.0f);
-        lighted_3D.setFloat("specularStrength", 0.5f);
-        lighted_3D.setInt("shininess", 32);
-        lighted_3D.setVec3("viewPos", pos);
-        lighted_3D.setVec3("lightPos", lightPos);
+		lighted_3D.setFloat("ambientStrength", 0.1f);
+		lighted_3D.setFloat("diffuseStrength", 1.0f);
+		lighted_3D.setFloat("specularStrength", 0.5f);
+		lighted_3D.setInt("shininess", 512);
+		lighted_3D.setVec3("viewPos", pos);
+		lighted_3D.setVec3("lightPos", lightPos);
 
 		glBindVertexArray(VAO);
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, containerTex);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, specularMap);
 
 		// draw cube
 		lighted_3D.setMat4("model", cube);
@@ -186,4 +169,40 @@ int main()
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
 	glViewport(0, 0, width, height);
+}
+
+unsigned int loadTexture(char const *path)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+
+	int width, height, nrComponents;
+	unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+	if (data) {
+		GLenum format;
+		if (nrComponents == 1)
+			format = GL_RED;
+		else if (nrComponents == 3)
+			format = GL_RGB;
+		else if (nrComponents == 4)
+			format = GL_RGBA;
+
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format,
+					 GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+						GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		stbi_image_free(data);
+	} else {
+		std::cout << "Texture failed to load at path: " << path << std::endl;
+		stbi_image_free(data);
+	}
+
+	return textureID;
 }

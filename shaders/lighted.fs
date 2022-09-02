@@ -5,7 +5,8 @@ in vec2 TexCoord;
 in vec3 Normal;
 in vec3 FragPosition;
 
-uniform sampler2D ourTexture;
+uniform sampler2D diffuseTexture;
+uniform sampler2D specularMap;
 
 uniform vec3 lightColor;
 uniform vec3 lightPos;
@@ -17,11 +18,11 @@ uniform int shininess;
 
 void main()
 {
-    // ambient light -----------------------------------------------------
-    vec3 ambientLight = ambientStrength * lightColor;
-
     // material / texture color ------------------------------------------
-    vec3 color = vec3(texture(ourTexture, TexCoord));
+    vec3 color = vec3(texture(diffuseTexture, TexCoord));
+    
+    // ambient light -----------------------------------------------------
+    vec3 ambientLight = ambientStrength * color * lightColor;
     
     // diffuse light -----------------------------------------------------
     // Normal might not actually be... normal
@@ -31,15 +32,18 @@ void main()
     // the "max" is there because if the vertex is facing away from
     // the light, it should just have 0 light, not negative
     vec3 diffuseLight = max(dot(norm, lightDirection), 0.0) * lightColor
-        * diffuseStrength;
+        * diffuseStrength * color;
 
     // special highlight -------------------------------------------------
     vec3 viewDir = normalize(viewPos - FragPosition);
     vec3 reflectDir = reflect(-lightDirection, norm);
     float specularEffect = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-    vec3 specularLight = specularEffect * specularStrength * lightColor;
+    vec3 specularLight = specularEffect
+    * specularStrength
+    * texture(specularMap, TexCoord).rgb
+    * lightColor;
     
     // final color -------------------------------------------------------
     FragColor = vec4(
-        (diffuseLight + ambientLight + specularLight) * color, 1.0);
+        (diffuseLight + ambientLight + specularLight), 1.0);
 }
