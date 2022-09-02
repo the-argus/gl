@@ -117,7 +117,9 @@ int main()
 	// translations performed on the model
 	glm::mat4 cube = glm::translate(model, glm::vec3(0.0f, 0.0f, -10.0f));
 	cube = glm::rotate(cube, glm::radians(30.0f), glm::vec3(-1.0f, 1.0f, 0.0f));
-	glm::mat4 lightcube = glm::translate(model, glm::vec3(1.5f, 1.0f, -10.0f));
+
+    glm::vec3 lightPos = glm::vec3(1.5f, 1.0f, -10.0f);
+	glm::mat4 lightcube = glm::translate(model, lightPos);
 	lightcube = glm::rotate(lightcube, glm::radians(45.0f),
 							glm::vec3(1.0f, 1.0f, 0.0f));
 	lightcube = glm::scale(lightcube, glm::vec3(0.2f));
@@ -129,15 +131,27 @@ int main()
 	while (!glfwWindowShouldClose(window)) {
 		glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+        float time = glfwGetTime();
+		float radius = 5.0f;
+		float s = sin(time) * radius;
+		float c = cos(time) * radius;
+        glm::vec3 target = glm::vec3(cube[3]);
+        // circle target around x and z
+		glm::vec3 pos = glm::vec3(target.x + s, target.y, target.z + c);
+		view =
+			glm::lookAt(pos, target, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		lighted_3D.use();
 		lighted_3D.setMat4("projection", projection);
 		lighted_3D.setMat4("view", view);
 		lighted_3D.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         lighted_3D.setFloat("ambientStrength", 0.1f);
-        lighted_3D.setFloat("diffuseStrength", 10.0f);
-        glm::vec3 lp = glm::vec3(lightcube[3]);
-        lighted_3D.setVec3("lightPos", lp.x, lp.y, lp.z);
+        lighted_3D.setFloat("diffuseStrength", 1.0f);
+        lighted_3D.setFloat("specularStrength", 0.5f);
+        lighted_3D.setFloat("shininess", 256);
+        lighted_3D.setVec3("viewPos", pos);
+        lighted_3D.setVec3("lightPos", lightPos);
 
 		glBindVertexArray(VAO);
 		glBindTexture(GL_TEXTURE_2D, containerTex);
@@ -153,16 +167,6 @@ int main()
 		light_3D.setMat4("model", lightcube);
 		glBindVertexArray(lightcube_VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
-
-		float time = glfwGetTime();
-		float radius = 5.0f;
-		float s = sin(time) * radius;
-		float c = cos(time) * radius;
-        glm::vec3 target = glm::vec3(cube[3]);
-        // circle target around x and z
-		glm::vec3 pos = glm::vec3(target.x + s, target.y, target.z + c);
-		view =
-			glm::lookAt(pos, target, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
