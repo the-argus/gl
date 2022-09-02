@@ -149,7 +149,7 @@ int main()
         lighted_3D.setFloat("ambientStrength", 0.1f);
         lighted_3D.setFloat("diffuseStrength", 1.0f);
         lighted_3D.setFloat("specularStrength", 0.5f);
-        lighted_3D.setFloat("shininess", 256);
+        lighted_3D.setInt("shininess", 32);
         lighted_3D.setVec3("viewPos", pos);
         lighted_3D.setVec3("lightPos", lightPos);
 

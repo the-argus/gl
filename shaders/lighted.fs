@@ -13,7 +13,7 @@ uniform vec3 viewPos;
 uniform float ambientStrength;
 uniform float diffuseStrength;
 uniform float specularStrength;
-uniform uint shininess;
+uniform int shininess;
 
 void main()
 {
