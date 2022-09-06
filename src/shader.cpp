@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "shader.h"
+#include "shader.hpp"
 
 void Shader::use() { glUseProgram(Shader::ID); }
 void Shader::setBool(const std::string &name, bool value) const

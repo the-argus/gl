@@ -4,9 +4,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "constants.h"
-#include "cube.h"
-#include "shader.h"
+#include "constants.hpp"
+#include "cube.hpp"
+#include "shader.hpp"
 #include "stb_image.h"
 
 // function called whenever a user resizes the window

@@ -1,5 +1,5 @@
 #pragma once
-#include "glstructs.h"
+#include "glstructs.hpp"
 
 class Mesh
 {
