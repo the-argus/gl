@@ -38,10 +38,8 @@ void main()
     vec3 viewDir = normalize(viewPos - FragPosition);
     vec3 reflectDir = reflect(-lightDirection, norm);
     float specularEffect = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-    vec3 specularLight = specularEffect
-    * specularStrength
-    * texture(specularMap, TexCoord).rgb
-    * lightColor;
+    vec3 specularLight = specularEffect * specularStrength
+        * lightColor * texture(specularMap, TexCoord).rgb;
     
     // final color -------------------------------------------------------
     FragColor = vec4(

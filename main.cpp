@@ -126,10 +126,10 @@ int main()
 		lighted_3D.setMat4("projection", projection);
 		lighted_3D.setMat4("view", view);
 		lighted_3D.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-		lighted_3D.setFloat("ambientStrength", 0.1f);
+		lighted_3D.setFloat("ambientStrength", 0.4f);
 		lighted_3D.setFloat("diffuseStrength", 1.0f);
-		lighted_3D.setFloat("specularStrength", 0.5f);
-		lighted_3D.setInt("shininess", 512);
+		lighted_3D.setFloat("specularStrength", 1.0f);
+		lighted_3D.setInt("shininess", 1024);
 		lighted_3D.setVec3("viewPos", pos);
 		lighted_3D.setVec3("lightPos", lightPos);
 
