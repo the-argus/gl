@@ -1,13 +1,15 @@
 #pragma once
+#include <vector>
 #include "glstructs.hpp"
+#include "shader.hpp"
 
 class Mesh
 {
   public:
 	// mesh data
-	vector<Vertex> vertices;
-	vector<unsigned int> indices;
-	vector<Texture> textures;
+	std::vector<Vertex> vertices;
+	std::vector<unsigned int> indices;
+	std::vector<Texture> textures;
 
 	Mesh(vector<Vertex> vertices, vector<unsigned int> indices,
 		 vector<Texture> textures);
